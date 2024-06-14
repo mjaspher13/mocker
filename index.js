@@ -6,7 +6,7 @@ const app = express();
 const port = 3000;
 
 // Load mock data from JSON file
-const mockData = JSON.parse(fs.readFileSync(path.join(__dirname, 'SLGFI-AHO-MOCK-[NEW]_2024-06-14.json'), 'utf8'));
+const mockData = JSON.parse(fs.readFileSync(path.join(__dirname, 'routes.json'), 'utf8'));
 
 // Function to set up mock routes
 const setupMockRoutes = (app, mockData) => {
