@@ -1,14 +1,19 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const cors = require('cors');
+require('dotenv').config();
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-// Load mock data from JSON file
-const mockData = JSON.parse(fs.readFileSync(path.join(__dirname, 'routes.json'), 'utf8'));
+const mockData = JSON.parse(fs.readFileSync(path.join(__dirname, process.env.MOCK_DATA_FILE), 'utf8'));
 
-// Function to set up mock routes
+app.use(cors({
+    origin: process.env.CORS_ORIGIN,
+    allowedHeaders: ['content-type', 'X-Traceability-Id']
+}));
+
 const setupMockRoutes = (app, mockData) => {
     mockData.resources.forEach(resource => {
         if (resource.type === 'MockRoute') {
@@ -27,7 +32,6 @@ const setupMockRoutes = (app, mockData) => {
     });
 };
 
-// Set up the routes
 setupMockRoutes(app, mockData);
 
 app.listen(port, () => {

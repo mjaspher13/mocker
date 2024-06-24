@@ -1,15 +1,24 @@
 {
-    "name": "mock-server",
-    "version": "1.0.0",
-    "description": "A Node.js server that consumes JSON data from an Insomnia mock server export",
-    "main": "index.js",
-    "scripts": {
-      "start": "node index.js"
-    },
-    "dependencies": {
-      "express": "^4.17.3"
-    },
-    "author": "",
-    "license": "ISC"
+  "name": "mocker",
+  "version": "1.0.0",
+  "description": "Project with both client and server",
+  "scripts": {
+    "install:all": "concurrently \"npm install --prefix client\" \"npm install --prefix server\"",
+    "dev": "concurrently \"npm run dev:next\" \"npm run dev:server\"",
+    "dev:next": "npm run dev --prefix client",
+    "dev:server": "npm run start --prefix server",
+    "build": "next build",
+    "start": "NODE_ENV=production node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "concurrently": "^6.2.1"
   }
-  
+}
