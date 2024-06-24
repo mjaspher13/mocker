@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 export async function POST(req) {
-  const filePath = path.join(process.cwd(), 'routes.json');
+  const filePath = path.join(process.cwd(), '../server/routes.json');
   try {
     const body = await req.json();
     fs.writeFileSync(filePath, JSON.stringify(body, null, 2), 'utf8');
