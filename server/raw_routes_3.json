@@ -1,0 +1,4573 @@
+openapi: 3.0.0
+info:
+  version: 1.3.2
+  title: Policy Service API
+  description: >-
+    Retrieves policy details, both VUL and trad, from Ingenium DB, Ingenium
+    Webservice and Client DB.
+  contact:
+    name: ASCP Common API Team
+    email: ASCP-Common-API-Services-Team@sunlife.com
+    url: >-
+      https://sunlifefinancial.sharepoint.com/sites/Operations/ASCPDA/ASCProductManagement/SitePages/slf-lif.aspx
+  x-api-id: '0403'
+  x-rapidapi-team: PH-Common-APIs-Team
+  x-business-domain: Cross-Cutting Platforms
+  x-region: SLF Asia
+  x-api-type: System
+  x-journey-stage: Interaction Omni-Channel
+  x-country: PH
+externalDocs:
+  description: Policy Service Bitbucket Link
+  url: http://sv516072.ph.sunlife:7990/projects/COM/repos/slf-life-svc/browse
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: >-
+      https://virtserver.swaggerhub.com/Sun-Life-Financial/policy-service-api/1.0.0
+  - url: https://sv84959.sunlifecorp.com:34443/dev-l4j-ph-policy-service
+    description: DEV server environment
+  - url: https://sv85333.sunlifecorp.com:34443/sit-l4j-ph-policy-service
+    description: SIT server environment
+  - url: https://sv85185.sunlifecorp.com:34443/uat-l4j-ph-policy-service
+    description: UAT server environment
+  - url: https://sv85215.sunlifecorp.com:34443/l4j-ph-policy-service
+    description: PROD 1 server environment
+  - url: https://sv85216.sunlifecorp.com:34443/l4j-ph-policy-service
+    description: PROD 2 server environment
+  - url: https://de-servicing.sunlifecorp.com/l4j-ph-policy-service
+    description: PROD F5 server environment
+tags:
+  - name: life-service-controller
+    description: Life Service Controller
+    externalDocs:
+      description: ''
+      url: ''
+  - name: policy-details-controller
+    description: Endpoints that retrieves policy details from Client DB
+    externalDocs:
+      description: ''
+      url: ''
+  - name: policy-service-controller
+    description: Endpoints that retrieves policy details from Ingenium DB/Webservice
+    externalDocs:
+      description: ''
+      url: ''
+  - name: policy-eligibility-controller
+    description: Endpoint that checks for eligibility via Ingenium DB/Webservice
+    externalDocs:
+      description: ''
+      url: ''
+  - name: policy-creation-controller
+    description: Endpoints that creates a new policy into Ingenium DB/Webservice
+    externalDocs:
+      description: ''
+      url: ''
+paths:
+  /health-check:
+    get:
+      tags:
+        - life-service-controller
+      summary: Health check
+      description: Health check api for Policy service
+      operationId: healthCheckUsingGET
+      parameters:
+        - $ref: '#/components/parameters/x-traceability-id'
+        - $ref: '#/components/parameters/x-correlation-id'
+        - $ref: '#/components/parameters/x-auth-token'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                dbHealthCheck:
+                  PASSED:
+                    - CLI_PRTFO_LF_T TABLE
+                    - CLI_PRTFO_LF_STAT TABLE
+                    - CLI_BNFY_LF_T TABLE
+                    - CLI_CVG_LF_T TABLE
+                    - TCVG
+                    - TEDIT
+                    - TFA
+                slocipiIngeniumHealthCheck: true
+                slgfiIngeniumHealthCheck: false
+        '400':
+          description: Request validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal server error
+      deprecated: false
+      security:
+        - dev-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+  /policy/trad/details/{referenceNo}:
+    get:
+      tags:
+        - policy-details-controller
+      summary: Retrieves policy Trad details
+      description: Retrieves policy Trad details
+      operationId: getPolicyDetailsTradUsingGET
+      parameters:
+        - $ref: '#/components/parameters/x-traceability-id'
+        - $ref: '#/components/parameters/x-correlation-id'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/version'
+        - $ref: '#/components/parameters/correlation-id'
+        - $ref: '#/components/parameters/referenceNo'
+      responses:
+        '200':
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PolicyDetailsTradDto'
+        '400':
+          description: Request Validation Error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      deprecated: false
+      security:
+        - dev-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+  /policy/vul/details/{referenceNo}:
+    get:
+      tags:
+        - policy-details-controller
+      summary: Retrieves policy VUL details
+      description: Retrieves policy VUL details
+      operationId: getPolicyDetailsVulUsingGET
+      parameters:
+        - $ref: '#/components/parameters/x-traceability-id'
+        - $ref: '#/components/parameters/x-correlation-id'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/version'
+        - $ref: '#/components/parameters/correlation-id'
+        - $ref: '#/components/parameters/referenceNo'
+      responses:
+        '200':
+          description: Successful
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PolicyDetailsVulDto'
+        '400':
+          description: Request Validation Error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      deprecated: false
+      security:
+        - dev-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+  /policy/infos/{referenceNo}:
+    get:
+      tags:
+        - policy-service-controller
+      summary: Retrieved non-derived policy information
+      description: Policy Details (Trad and VUL)
+      operationId: policyNonDerivedInfos
+      parameters:
+        - $ref: '#/components/parameters/x-traceability-id'
+        - $ref: '#/components/parameters/x-correlation-id'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/referenceNo'
+        - $ref: '#/components/parameters/version'
+        - $ref: '#/components/parameters/relTypeCd'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyInfosDto'
+              example:
+                data:
+                  policyNumber: '0809986876'
+                  productName: Sun Maxilink One
+                  productCode: ML1P1C
+                  insuranceType: '7'
+                  issueDate: '2015-07-13'
+                  inforceDate: ''
+                  currency: Php
+                  faceAmount: 75000
+                  policyDuration: '002'
+                  policyStatusCd: '4'
+                  policyStatusDesc: PAID-UP ANNUITY/EXTENDED TERM
+                  billTypeCd: '1'
+                  billTypeDesc: Direct Bill
+                  billModeCd: '12'
+                  billModeDesc: Yearly
+                  premiumDueDate: '2018-05-13'
+                  nfoOptCd: '7'
+                  prepaidAmount: 0
+                  premOffsetCd: I
+                  premOffsetDt: '2021-08-24'
+                  sundryAmount: 0
+                  totalAmountDue: 0
+                  totalFundValue: 24556.28
+                  fundValueAsOfIssueDate: '2021-07-13'
+                  sumAssured: 75000
+                  lastDeposit: 0
+                  lastDepositDate: '2021-07-24'
+                  lapseStrtDate: ''
+                  totalInsuranceCvg: ''
+                  modalPremium: 300000
+                  loanIntrestInAdv: ''
+                  insuredName: FIRSTNAME/3001572378
+                  insuredGenderCd: ''
+                  insuredGender: Female
+                  insuredSmokerCd: ''
+                  insuredSmokerDesc: Non-Smoker
+                  insuredBirthdate: '1983-03-21'
+                  insuredOccupation: Director - Corporation
+                  insuredMaritalStatus: Single
+                  beneficiaryInstructions: ''
+                  coverageAsOfDate: '2010-08-24'
+                  coverageDetailList:
+                    - effectiveDate: '2018-05-31'
+                      policyRiderCode: ML1P1C
+                      policyRiderName: Sun MaxiLink One
+                      coverageNum: '01'
+                      coverageStatusCd: '4'
+                      coverageStatus: PAID-UP ANNUITY/EXTENDED TERM
+                      coverageFaceAmount: 0
+                      maturityDate: '2071-07-13'
+                      benefitType: '0'
+                  beneficiaryList:
+                    - beneficiaryName: NAME/0809986876/1
+                      beneficiaryRelationshipCd: ''
+                      beneficiaryRelationship: Mother
+                      beneficiaryDesignationCd: ''
+                      beneficiaryDesignation: Primary
+                      beneficiaryIrrevocableRevocableCd: ''
+                      beneficiaryIrrevocableRevocable: Irrevocable
+                      beneficiaryTypeCd: ''
+                      beneficiaryType: DEATH
+                      beneficiaryPercentage: 100%
+                      beneficiaryBirthdate: '1946-04-25'
+                  dividendEndowmentInformation:
+                    dividendDeclared: 0
+                    dividendValueDate: '2021-08-24'
+                    dividendOptCd: '4'
+                    dividendOptDesc: DIVIDEND ACCUMULATION
+                    dividendYear: '2021'
+                    accumulatedDividend: 0
+                    accumulatedEndowmentOption: 0
+                  planPayoutList:
+                    - planPayoutCd: A
+                  assigneeList:
+                    - name: John Doe
+                      assigneeEffDate: '2071-07-13'
+                      relTypeDesc: Assignee
+                      relTypeCd: A
+                      relSubTypeCd: A
+                  servicingAdvisor: '082508'
+                  loanInterestRate: 10
+                  insuredAgeAtIssueDate: '033'
+                  insuredBirthLocation: ISABELA
+                  osDisbursementAmount: 0
+                notifications:
+                  - code: SUC00000000
+                    message: Success
+                    description: The request was successfully submitted
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '400':
+          description: Request validation error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010002
+                    message: UNAUTHORIZED_REQUEST
+                    description: The request has authentication error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010003
+                    message: FORBIDDEN_REQUEST
+                    description: >-
+                      The request does not have sufficient rights to perform
+                      this operation on the requested resource.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010004
+                    message: RESOURCE_NOT_FOUND
+                    description: The requested resource was not found.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010005
+                    message: INTERNAL_SERVER_ERRPR
+                    description: Internal Server Error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+      deprecated: false
+      security:
+        - dev-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+        - sit-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+        - uat-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+  /policies:
+    get:
+      tags:
+        - policy-service-controller
+      summary: >-
+        Retrieved non-derived Policies information that accepts multiple
+        Policy(Reference) Numbers from Ingenium DB
+      description: >-
+        Policies Details (Trad and VUL) that accepts multiple Policy(Reference)
+        Numbers
+      operationId: policiesNonDerivedInfos
+      parameters:
+        - $ref: '#/components/parameters/x-traceability-id'
+        - $ref: '#/components/parameters/x-correlation-id'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/policyNumbers'
+        - $ref: '#/components/parameters/version'
+        - $ref: '#/components/parameters/optimized'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NonDerivedPolicyInfo'
+              examples:
+                NonOptimizedPolicyDetails:
+                  value:
+                    data:
+                      - policyNumber: '0809986876'
+                        productName: Sun Maxilink One
+                        productCode: ML1P1C
+                        insuranceType: '7'
+                        issueDate: '2015-07-13'
+                        currency: Php
+                        faceAmount: 75000
+                        policyDuration: '002'
+                        policyStatusCd: '4'
+                        policyStatusDesc: PAID-UP ANNUITY/EXTENDED TERM
+                        billTypeCd: '1'
+                        billTypeDesc: Direct Bill
+                        billModeCd: '01'
+                        billModeDesc: Yearly
+                        premiumDueDate: '2018-05-13'
+                        nfoOptCd: '7'
+                        paidToDate: ''
+                        commentsRemarks: ''
+                        prepaidAmount: 0
+                        premOffsetCd: I
+                        premOffsetDt: '2021-08-24'
+                        sundryAmount: 0
+                        totalAmountDue: 0
+                        fundValueAsOfIssueDate: '2021-07-13'
+                        sumAssured: 75000
+                        freezeOrder: 'Y'
+                        lastDeposit: 0
+                        lastDepositDate: '2021-07-24'
+                        lapseStrtDate: ''
+                        totalInsuranceCvg: ''
+                        premiumAmount: 180000
+                        modalPremium: 300000
+                        lastModePremium: 30000
+                        insuredId: '35434533'
+                        insuredFirstName: Stuart
+                        insuredMiddleName: ''
+                        insuredLastName: Bloom
+                        insuredName: Stuart/3001572378
+                        insuredRelationshipDesc: ''
+                        insuredGenderCd: ''
+                        insuredGender: Female
+                        insuredSmokerCd: ''
+                        insuredSmokerDesc: Non-Smoker
+                        insuredBirthdate: '1983-03-21'
+                        insuredBirthLocation: ISABELA
+                        insuredCitizenship1: ''
+                        insuredCitizenship2: ''
+                        insuredCitizenship3: ''
+                        insuredEffectivedate: '2022-01-01'
+                        insuredCompanyName: ''
+                        insuredLegalName: ''
+                        insuredOccupation: Director - Corporation
+                        insuredMaritalStatusCd: S
+                        insuredMaritalStatusDesc: Single
+                        insuredHomePhoneNumber: (02) 123-3432
+                        insuredBusinessPhoneNumber: (02) 123-3432
+                        insuredMobileNumber: '09181234567'
+                        insuredEmail: joe.smith@yomail.com
+                        insuredCompleteAddress: 5th Avenue BGC
+                        beneficiaryInstructions: ''
+                        coverageAsOfDate: '2010-08-24'
+                        coverageDetailList:
+                          - effectiveDate: '2018-05-31'
+                            policyRiderCode: ML1P1C
+                            policyRiderName: Sun MaxiLink One
+                            coverageNum: '01'
+                            coverageStatusCd: '4'
+                            coverageStatus: PAID-UP ANNUITY/EXTENDED TERM
+                            coverageFaceAmount: 0
+                            maturityDate: '2071-07-13'
+                            benefitType: '0'
+                            embedded: true
+                        beneficiaryList:
+                          - sequenceNumber: ''
+                            coverageNumber: ''
+                            beneficiaryProceeds: ''
+                            beneficiaryName: NAME/0809986876/1
+                            beneficiaryRelationshipCd: ''
+                            beneficiaryRelationship: Mother
+                            beneficiaryDesignationCd: ''
+                            beneficiaryDesignation: Primary
+                            beneficiaryIrrevocableRevocableCd: ''
+                            beneficiaryIrrevocableRevocable: Irrevocable
+                            beneficiaryTypeCd: ''
+                            beneficiaryType: DEATH
+                            beneficiaryPercentage: 100%
+                            beneficiaryBirthdate: '1946-04-25'
+                            beneficiaryCitizenship: FIL
+                            beneficiarySexCd: F
+                            beneficiaryBirthCountryCd: PH
+                            beneficiaryAddrLine1: Address Line 1
+                            beneficiaryAddrLine2: Address Line 2
+                            beneficiaryAddrLine3: Address Line 3
+                            beneficiaryAddrCountryCd: AC
+                            beneficiaryAddrCity: Test City
+                            beneficiaryProvinceCd: BS
+                            beneficiaryPostalCd: '1111'
+                            homeNoCountryCd: '0063'
+                            homeNoAreaCd: '0062'
+                            homeNo: '321321333'
+                            mobileNoCountryCd: '0063'
+                            mobileNoAreaCd: '0062'
+                            mobileNo: '321321333'
+                        dividendEndowmentInformation:
+                          dividendDeclared: 0
+                          dividendValueDate: '2021-08-24'
+                          dividendOptCd: '4'
+                          dividendOptDesc: DIVIDEND ACCUMULATION
+                          dividendYear: '2021'
+                          accumulatedDividend: 0
+                          accumulatedEndowmentOption: 0
+                        planPayoutList:
+                          - planPayoutCd: A
+                        insuredAddressDetails:
+                          addressLine1: ''
+                          addressLine2: ''
+                          addressLine3: ''
+                          zipCode: ''
+                          city: ''
+                          country: ''
+                          province: ''
+                        policyOwner:
+                          clientId: ''
+                          name: ''
+                          birthday: ''
+                          birthLocation: ''
+                          sex: ''
+                          smoker: ''
+                          maritalStatus: ''
+                          citizenship1: ''
+                          citizenship2: ''
+                          citizenship3: ''
+                          effectiveDate: ''
+                          companyName: ''
+                          legalName: ''
+                          billingName: ''
+                          addressLine1: ''
+                          addressLine2: ''
+                          addressLine3: ''
+                          zipCode: ''
+                          city: ''
+                          country: ''
+                          province: ''
+                        servicingAdvisor: '082508'
+                        servicingAdvisorName: ''
+                        servicingAdvisorStatusCode: ''
+                        servicingAdvisorBranchName: ''
+                        loanInterestRate: 10
+                        reinstatementDate: '2015-07-13'
+                        processDate: '2015-10-10'
+                        osDisbursementAmount: 0
+                        prevPremiumAmount: 0
+                        pdfSuspenseAmount: 0
+                        reinsuranceCode: ''
+                        trusteeName: ''
+                      - policyNumber: '0809986876'
+                        productName: Sun Maxilink One
+                        productCode: ML1P1C
+                        insuranceType: '7'
+                        issueDate: '2015-07-13'
+                        currency: Php
+                        faceAmount: 75000
+                        policyDuration: '002'
+                        policyStatusCd: '4'
+                        policyStatusDesc: PAID-UP ANNUITY/EXTENDED TERM
+                        billTypeCd: '1'
+                        billTypeDesc: Direct Bill
+                        billModeCd: '01'
+                        billModeDesc: Yearly
+                        premiumDueDate: '2018-05-13'
+                        nfoOptCd: '7'
+                        paidToDate: ''
+                        commentsRemarks: ''
+                        prepaidAmount: 0
+                        premOffsetCd: I
+                        premOffsetDt: '2021-08-24'
+                        sundryAmount: 0
+                        totalAmountDue: 0
+                        totalFundValue: 24556.28
+                        fundValueAsOfIssueDate: '2021-07-13'
+                        sumAssured: 75000
+                        lastDeposit: 0
+                        lastDepositDate: '2021-07-24'
+                        lapseStrtDate: ''
+                        totalInsuranceCvg: ''
+                        premiumAmount: 180000
+                        modalPremium: 300000
+                        lastModePremium: 30000
+                        loanIntrestInAdv: ''
+                        insuredId: '35434533'
+                        insuredFirstName: Stuart
+                        insuredMiddleName: ''
+                        insuredLastName: Bloom
+                        insuredName: Stuart/3001572378
+                        insuredRelationshipDesc: ''
+                        insuredGenderCd: ''
+                        insuredGender: Female
+                        insuredSmokerCd: ''
+                        insuredSmokerDesc: Non-Smoker
+                        insuredBirthdate: '1983-03-21'
+                        insuredBirthLocation: ''
+                        insuredEffectivedate: '2022-01-01'
+                        insuredCompanyName: ''
+                        insuredLegalName: ''
+                        insuredOccupation: Director - Corporation
+                        insuredMaritalStatusCd: S
+                        insuredMaritalStatusDesc: Single
+                        insuredHomePhoneNumber: (02) 123-3432
+                        insuredBusinessPhoneNumber: (02) 123-3432
+                        insuredMobileNumber: '09181234567'
+                        insuredEmail: joe.smith@yomail.com
+                        insuredCompleteAddress: 5th Avenue BGC
+                        beneficiaryInstructions: ''
+                        coverageAsOfDate: '2010-08-24'
+                        coverageDetailList:
+                          - effectiveDate: '2018-05-31'
+                            policyRiderCode: ML1P1C
+                            policyRiderName: Sun MaxiLink One
+                            coverageNum: '01'
+                            coverageStatusCd: '4'
+                            coverageStatus: PAID-UP ANNUITY/EXTENDED TERM
+                            coverageFaceAmount: 0
+                            maturityDate: '2071-07-13'
+                            embedded: true
+                        beneficiaryList:
+                          - sequenceNumber: ''
+                            coverageNumber: ''
+                            beneficiaryProceeds: ''
+                            beneficiaryName: NAME/0809986876/1
+                            beneficiaryRelationshipCd: ''
+                            beneficiaryRelationship: Mother
+                            beneficiaryDesignationCd: ''
+                            beneficiaryDesignation: Primary
+                            beneficiaryIrrevocableRevocableCd: ''
+                            beneficiaryIrrevocableRevocable: Irrevocable
+                            beneficiaryTypeCd: ''
+                            beneficiaryType: DEATH
+                            beneficiaryPercentage: 100%
+                            beneficiaryBirthdate: '1946-04-25'
+                            beneficiaryCitizenship: FIL
+                            beneficiarySexCd: F
+                            beneficiaryBirthCountryCd: PH
+                            beneficiaryAddrLine1: Address Line 1
+                            beneficiaryAddrLine2: Address Line 2
+                            beneficiaryAddrLine3: Address Line 3
+                            beneficiaryAddrCountryCd: AC
+                            beneficiaryAddrCity: Test City
+                            beneficiaryProvinceCd: BS
+                            beneficiaryPostalCd: '1111'
+                            homeNoCountryCd: '0063'
+                            homeNoAreaCd: '0062'
+                            homeNo: '321321333'
+                            mobileNoCountryCd: '0063'
+                            mobileNoAreaCd: '0062'
+                            mobileNo: '321321333'
+                        dividendEndowmentInformation:
+                          dividendDeclared: 0
+                          dividendValueDate: '2021-08-24'
+                          dividendOptCd: '4'
+                          dividendOptDesc: DIVIDEND ACCUMULATION
+                          dividendYear: '2021'
+                          accumulatedDividend: 0
+                          accumulatedEndowmentOption: 0
+                        planPayoutList:
+                          - planPayoutCd: A
+                        insuredAddressDetails:
+                          addressLine1: ''
+                          addressLine2: ''
+                          addressLine3: ''
+                          zipCode: ''
+                          city: ''
+                          country: ''
+                          province: ''
+                        policyOwner:
+                          clientId: ''
+                          name: ''
+                          birthday: ''
+                          birthLocation: ''
+                          sex: ''
+                          smoker: ''
+                          maritalStatus: ''
+                          citizenship1: ''
+                          citizenship2: ''
+                          citizenship3: ''
+                          effectiveDate: ''
+                          companyName: ''
+                          legalName: ''
+                          billingName: ''
+                          addressLine1: ''
+                          addressLine2: ''
+                          addressLine3: ''
+                          zipCode: ''
+                          city: ''
+                          country: ''
+                          province: ''
+                        servicingAdvisor: '082508'
+                        servicingAdvisorName: ''
+                        servicingAdvisorStatusCode: ''
+                        servicingAdvisorBranchName: ''
+                        loanInterestRate: 10
+                        reinstatementDate: '2015-07-13'
+                        processDate: '2015-10-10'
+                        osDisbursementAmount: 0
+                        prevPremiumAmount: 0
+                        pdfSuspenseAmount: 0
+                        reinsuranceCode: ''
+                        trusteeName: ''
+                        insuredAgeAtIssueDate: '033'
+                    notifications:
+                      - code: SUC00000000
+                        message: Success
+                        description: The request was successfully submitted
+                        timestamp: 2020-09-25T17:55:04.288+0000
+                        metadata: null
+                OptimizedPolicyDetails:
+                  value:
+                    data:
+                      - policyNumber: '0809986876'
+                        productName: Sun Maxilink One
+                        productCode: ML1P1C
+                        issueDate: '2015-07-13'
+                        policyStatusCd: '4'
+                        policyStatusDesc: PAID-UP ANNUITY/EXTENDED TERM
+                        sumAssured: 75000
+                        insuredId: '35434533'
+                        insuredFirstName: Stuart
+                        insuredMiddleName: ''
+                        insuredLastName: Bloom
+                        insuredName: Stuart/3001572378
+                        insuredRelationshipDesc: ''
+                        insuredBirthdate: '1983-03-21'
+                        insuredBirthLocation: ISABELA
+                        insuredHomePhoneNumber: (02) 123-3432
+                        insuredBusinessPhoneNumber: (02) 123-3432
+                        insuredMobileNumber: '09181234567'
+                        insuredEmail: joe.smith@yomail.com
+                        insuredCompleteAddress: 5th Avenue BGC
+                        insuredGenderCd: ''
+                        insuredGender: Female
+                        coverageDetailList:
+                          - effectiveDate: '2018-05-31'
+                            policyRiderCode: ML1P1C
+                            policyRiderName: Sun MaxiLink One
+                            coverageNum: '01'
+                            coverageStatusCd: '4'
+                            coverageStatus: PAID-UP ANNUITY/EXTENDED TERM
+                            coverageFaceAmount: 0
+                            maturityDate: '2071-07-13'
+                            benefitType: '0'
+                            embedded: true
+                        reinstatementDate: '2015-07-13'
+                      - policyNumber: '0809986876'
+                        productName: Sun Maxilink One
+                        productCode: ML1P1C
+                        issueDate: '2015-07-13'
+                        policyStatusCd: '4'
+                        policyStatusDesc: PAID-UP ANNUITY/EXTENDED TERM
+                        insuredId: '35434533'
+                        insuredFirstName: Stuart
+                        insuredMiddleName: ''
+                        insuredLastName: Bloom
+                        insuredName: Stuart/3001572378
+                        insuredBirthdate: '1983-03-21'
+                        coverageDetailList:
+                          - effectiveDate: '2018-05-31'
+                            policyRiderCode: ML1P1C
+                            policyRiderName: Sun MaxiLink One
+                            coverageNum: '01'
+                            coverageStatusCd: '4'
+                            coverageStatus: PAID-UP ANNUITY/EXTENDED TERM
+                            coverageFaceAmount: 0
+                            maturityDate: '2071-07-13'
+                            embedded: true
+                        reinstatementDate: '2015-07-13'
+                        osDisbursementAmount: 0
+                        insuredAgeAtIssueDate: '033'
+                    notifications:
+                      - code: SUC00000000
+                        message: Success
+                        description: The request was successfully submitted
+                        timestamp: 2020-09-25T17:55:04.288+0000
+                        metadata: null
+        '400':
+          description: Request validation error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010002
+                    message: UNAUTHORIZED_REQUEST
+                    description: The request has authentication error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010003
+                    message: FORBIDDEN_REQUEST
+                    description: >-
+                      The request does not have sufficient rights to perform
+                      this operation on the requested resource.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010004
+                    message: RESOURCE_NOT_FOUND
+                    description: The requested resource was not found.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010005
+                    message: INTERNAL_SERVER_ERRPR
+                    description: Internal Server Error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+      deprecated: false
+      security:
+        - dev-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+        - sit-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+        - uat-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+        - prod-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+    post:
+      tags:
+        - policy-creation-controller
+      summary: create policy
+      description: Create policy using ingenium calls
+      operationId: createPolicy
+      requestBody:
+        $ref: '#/components/requestBodies/PostPolicyRequest'
+      parameters:
+        - $ref: '#/components/parameters/x-traceability-id'
+        - $ref: '#/components/parameters/x-correlation-id'
+        - $ref: '#/components/parameters/x-auth-token'
+      responses:
+        '201':
+          description: New Policy Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/IngeniumResponse'
+                  notifications:
+                    $ref: '#/components/schemas/Notification'
+                example:
+                  data:
+                    - endpoint: PolicyCreate
+                      sourceSystem: ingenium
+                      sourceSystemResponse:
+                        PolicyData:
+                          MirPolId:
+                            MirPolIdBase: '258010197'
+                            MirPolIdSfx: '7'
+                        MirUserMsgG:
+                          MirUserMsgTxtG:
+                            MirUserMsgTxtT: MAINTENANCE COMPLETED - CONTINUE
+                          MirUserMsgSevrtyG:
+                            MirUserMsgSevrtyT: '1'
+                    - endpoint: CoverageCreate
+                      sourceSystem: ingenium
+                      sourceSystemResponse:
+                        CoverageData:
+                          MirCvgNum: '02'
+                  notifications:
+                    - code: 201
+                      message: Success
+                      description: The request was successfully submitted
+                      timestamp: '2020-09-25T17:55:04.28'
+        '400':
+          description: Request validation error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              examples:
+                RequestValidationError:
+                  value:
+                    data: null
+                    notifications:
+                      - code: ERR00010001
+                        message: REQUEST_VALIDATION_ERROR
+                        description: Place Ingenium error message here.
+                        timestamp: 2020-09-25T17:55:04.288+0000
+                        metadata: null
+                BadPolicyNumberError:
+                  value:
+                    data: null
+                    notifications:
+                      - code: ERR00010002
+                        message: BAD_POLICY_NUMBER
+                        description: >-
+                          Unable to continue policy create with provided policy
+                          number.
+                        timestamp: 2020-09-25T17:55:04.288+0000
+                        metadata: null
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010002
+                    message: UNAUTHORIZED_REQUEST
+                    description: The request has authentication error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010003
+                    message: FORBIDDEN_REQUEST
+                    description: >-
+                      The request does not have sufficient rights to perform
+                      this operation on the requested resource.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010004
+                    message: RESOURCE_NOT_FOUND
+                    description: The requested resource was not found.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010005
+                    message: INTERNAL_SERVER_ERRPR
+                    description: Internal Server Error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+      deprecated: false
+      security:
+        - dev-api-scope:
+            - apiplatform.asia.policyservice.policy.uad
+        - sit-api-scope:
+            - apiplatform.asia.policyservice.policy.uad
+        - uat-api-scope:
+            - apiplatform.asia.policyservice.policy.uad
+        - prod-api-scope:
+            - apiplatform.asia.policyservice.policy.uad
+  /policy/derived-infos/{referenceNo}:
+    get:
+      tags:
+        - policy-service-controller
+      summary: >-
+        Retrieved derived policy information from Ingenium 
+        ClientPortalPolicyDetails and InquiryConsolidatedInformation Webservice
+      description: Policy Details (Trad and VUL)
+      operationId: policyDerivedInfos
+      parameters:
+        - $ref: '#/components/parameters/x-traceability-id'
+        - $ref: '#/components/parameters/x-correlation-id'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/referenceNo'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyDerivedInfosDto'
+              example:
+                data:
+                  policyNumber: '0809986876'
+                  billingAddress: 124A Pasomil St., Cay Pombo, Santa Maria Bulacan
+                  premiumDueDate: '2021-08-24'
+                  prevPremiumDueDate: '2021-07-24'
+                  billToDate: '2021-08-24'
+                  loanInterestInAdv: 0
+                  totalFundValue: 50000
+                  totalFundValueAsOfDate: '2021-08-24'
+                  cashValue: 0
+                  cashValueDate: '2021-08-24'
+                  cashSurrenderValue: 24556.28
+                  cashSurrenderValueDate: '2021-08-24'
+                  loanBalance: 0
+                  maxLoanableAmount: 0
+                  endowmentOptCd: A
+                  endowmentOptDesc: Cash
+                  premiumAmount: 180000
+                  dividendValue: 0
+                  dividendValuePua: 0
+                  osDisbursement: 0
+                  premiumOffsetCode: '0'
+                  nonForfeitureCode: '3'
+                  reinsuranceCode: 'N'
+                  singlePremiumPaid: 0
+                  currentAnnualPremium: 0
+                  totalExcessPremium: 0
+                  totalFundWithdrawals: 0
+                notifications:
+                  - code: SUC00000000
+                    message: Success
+                    description: The request was successfully submitted
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '400':
+          description: Request validation error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010001
+                    message: REQUEST_VALIDATION_ERROR
+                    description: The request has invalid data.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010002
+                    message: UNAUTHORIZED_REQUEST
+                    description: The request has authentication error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010003
+                    message: FORBIDDEN_REQUEST
+                    description: >-
+                      The request does not have sufficient rights to perform
+                      this operation on the requested resource.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010004
+                    message: RESOURCE_NOT_FOUND
+                    description: The requested resource was not found.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010005
+                    message: INTERNAL_SERVER_ERRPR
+                    description: Internal Server Error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+      deprecated: false
+      security:
+        - dev-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+        - sit-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+        - uat-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+        - prod-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+  /policy/vul/funds/{referenceNo}:
+    get:
+      tags:
+        - policy-service-controller
+      summary: >-
+        Retrieved derived policy information VUL funds from Ingenium
+        InquiryFundDetails webservice
+      description: Policy Details (Trad and VUL)
+      operationId: policyDerivedInfosVulFunds
+      parameters:
+        - $ref: '#/components/parameters/x-traceability-id'
+        - $ref: '#/components/parameters/x-correlation-id'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/referenceNo'
+        - $ref: '#/components/parameters/companyCode'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyVulFundsDto'
+              example:
+                data:
+                  referenceNo: '0809986876'
+                  fundDetails:
+                    - fundCd: SLPEF
+                      fundName: Sun Life Phils - Peso Equity Fund
+                      units: 1022.5
+                      fundValueAmount: 3763.62
+                      fundAllocation: 100%
+                      unitPrice: 3.68
+                      fundValueAsofDate: '2021-09-01'
+                      currency: PS
+                notifications:
+                  - code: 200
+                    message: Success
+                    description: The request was successfully submitted
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '400':
+          description: Request validation error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010001
+                    message: REQUEST_VALIDATION_ERROR
+                    description: The request has invalid data.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010002
+                    message: UNAUTHORIZED_REQUEST
+                    description: The request has authentication error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010003
+                    message: FORBIDDEN_REQUEST
+                    description: >-
+                      The request does not have sufficient rights to perform
+                      this operation on the requested resource.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010004
+                    message: RESOURCE_NOT_FOUND
+                    description: The requested resource was not found.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010005
+                    message: INTERNAL_SERVER_ERRPR
+                    description: Internal Server Error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+      deprecated: false
+      security:
+        - dev-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+        - sit-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+        - uat-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+        - prod-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+  /policy/billing/{referenceNo}:
+    get:
+      tags:
+        - policy-service-controller
+      summary: >-
+        Retrieve the policy billing information from Ingenium DB and
+        ClientPortalPolicyDetails webservice
+      description: Policy Billing Information
+      operationId: policyBilling
+      parameters:
+        - $ref: '#/components/parameters/x-traceability-id'
+        - $ref: '#/components/parameters/x-correlation-id'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/referenceNo'
+        - $ref: '#/components/parameters/version'
+        - $ref: '#/components/parameters/companyCode'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyBillingDto'
+              example:
+                data:
+                  referenceNo: '0580067076'
+                  totalAmountDue: 979.58
+                  premiumDueDate: 05/02/2018
+                  paymentMode: EQUAL MONTHLY AMOUNTS
+                  premiumAmount: 998.5
+                  currency: PS
+                  billingType: '12'
+                  lastPaymentDate: 05/02/2024
+                  sundryAmount: 999.6
+                  showAdminBilling: true
+                  adminBillingAmount: 1111
+                notifications:
+                  - code: 200
+                    message: Success
+                    description: The request was successfully submitted
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '400':
+          description: Request validation error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010001
+                    message: REQUEST_VALIDATION_ERROR
+                    description: The request has invalid data.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010002
+                    message: UNAUTHORIZED_REQUEST
+                    description: The request has authentication error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010003
+                    message: FORBIDDEN_REQUEST
+                    description: >-
+                      The request does not have sufficient rights to perform
+                      this operation on the requested resource.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010004
+                    message: RESOURCE_NOT_FOUND
+                    description: The requested resource was not found.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010005
+                    message: INTERNAL_SERVER_ERRPR
+                    description: Internal Server Error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+      deprecated: false
+      security:
+        - dev-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+        - sit-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+        - uat-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+        - prod-api-scope:
+            - apiplatform.asia.policyservice.policy.read
+  /policies/{referenceNo}/beneficiaries:
+    post:
+      tags:
+        - beneficiary
+      summary: Add beneficiary to a policy
+      description: Add beneficiary to a policy via Ingenium Webservice
+      operationId: addBeneficiary
+      requestBody:
+        $ref: '#/components/requestBodies/PostBeneficiaryRequest'
+      parameters:
+        - $ref: '#/components/parameters/x-traceability-id'
+        - $ref: '#/components/parameters/x-correlation-id'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/referenceNo'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+              example:
+                data:
+                  sequenceNumber: '027'
+                notifications:
+                  - code: 201
+                    message: Success
+                    description: The request was successfully submitted
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '400':
+          description: Request validation error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010001
+                    message: REQUEST_VALIDATION_ERROR
+                    description: Place Ingenium error message here.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010002
+                    message: UNAUTHORIZED_REQUEST
+                    description: The request has authentication error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010003
+                    message: FORBIDDEN_REQUEST
+                    description: >-
+                      The request does not have sufficient rights to perform
+                      this operation on the requested resource.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010004
+                    message: RESOURCE_NOT_FOUND
+                    description: The requested resource was not found.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010005
+                    message: INTERNAL_SERVER_ERRPR
+                    description: Internal Server Error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+      deprecated: false
+      security:
+        - dev-api-scope:
+            - apiplatform.asia.policyservice.beneficiary.uad
+        - sit-api-scope:
+            - apiplatform.asia.policyservice.beneficiary.uad
+        - uat-api-scope:
+            - apiplatform.asia.policyservice.beneficiary.uad
+        - prod-api-scope:
+            - apiplatform.asia.policyservice.beneficiary.uad
+  /policies/{referenceNo}/beneficiaries/{sequenceNumber}:
+    put:
+      tags:
+        - beneficiary
+      summary: Update beneficiary of a policy
+      description: Update beneficiary of a policy via Ingenium Webservice
+      operationId: updateBeneficiary
+      requestBody:
+        $ref: '#/components/requestBodies/PutBeneficiaryRequest'
+      parameters:
+        - $ref: '#/components/parameters/x-traceability-id'
+        - $ref: '#/components/parameters/x-correlation-id'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/referenceNo'
+        - $ref: '#/components/parameters/sequenceNumber'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+              example:
+                data: null
+                notifications:
+                  - code: 201
+                    message: Success
+                    description: The request was successfully submitted
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '400':
+          description: Request validation error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010001
+                    message: REQUEST_VALIDATION_ERROR
+                    description: Place Ingenium error message here.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010002
+                    message: UNAUTHORIZED_REQUEST
+                    description: The request has authentication error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010003
+                    message: FORBIDDEN_REQUEST
+                    description: >-
+                      The request does not have sufficient rights to perform
+                      this operation on the requested resource.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010004
+                    message: RESOURCE_NOT_FOUND
+                    description: The requested resource was not found.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010005
+                    message: INTERNAL_SERVER_ERRPR
+                    description: Internal Server Error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+      deprecated: false
+      security:
+        - dev-api-scope:
+            - apiplatform.asia.policyservice.beneficiary.uad
+        - sit-api-scope:
+            - apiplatform.asia.policyservice.beneficiary.uad
+        - uat-api-scope:
+            - apiplatform.asia.policyservice.beneficiary.uad
+        - prod-api-scope:
+            - apiplatform.asia.policyservice.beneficiary.uad
+    delete:
+      tags:
+        - beneficiary
+      summary: Delete beneficiary of a policy
+      description: Delete beneficiary of a policy via Ingenium Webservice
+      operationId: deleteBeneficiary
+      parameters:
+        - $ref: '#/components/parameters/x-traceability-id'
+        - $ref: '#/components/parameters/x-correlation-id'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/referenceNo'
+        - $ref: '#/components/parameters/sequenceNumber'
+        - $ref: '#/components/parameters/companyCode'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+              example:
+                data: null
+                notifications:
+                  - code: 201
+                    message: Success
+                    description: The request was successfully submitted
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '400':
+          description: Request validation error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010001
+                    message: REQUEST_VALIDATION_ERROR
+                    description: Place Ingenium error message here.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010002
+                    message: UNAUTHORIZED_REQUEST
+                    description: The request has authentication error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010003
+                    message: FORBIDDEN_REQUEST
+                    description: >-
+                      The request does not have sufficient rights to perform
+                      this operation on the requested resource.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010004
+                    message: RESOURCE_NOT_FOUND
+                    description: The requested resource was not found.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010005
+                    message: INTERNAL_SERVER_ERRPR
+                    description: Internal Server Error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+      deprecated: false
+      security:
+        - dev-api-scope:
+            - apiplatform.asia.policyservice.beneficiary.uad
+        - sit-api-scope:
+            - apiplatform.asia.policyservice.beneficiary.uad
+        - uat-api-scope:
+            - apiplatform.asia.policyservice.beneficiary.uad
+        - prod-api-scope:
+            - apiplatform.asia.policyservice.beneficiary.uad
+  /policy/{referenceNo}/vul/withdraw:
+    post:
+      tags:
+        - fund-transactions
+      summary: File VUL Fund Withdraw
+      description: File VUL Fund Withdraw request via Ingenium Webservice
+      operationId: vulFundWithdraw
+      requestBody:
+        $ref: '#/components/requestBodies/PostVULWithdrawRequest'
+      parameters:
+        - $ref: '#/components/parameters/x-traceability-id'
+        - $ref: '#/components/parameters/x-correlation-id'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/referenceNo'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+              example:
+                data:
+                  completeTransactionIndicator: 'Y'
+                notifications:
+                  - code: 201
+                    message: Success
+                    description: The request was successfully submitted
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '400':
+          description: Request validation error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010001
+                    message: REQUEST_VALIDATION_ERROR
+                    description: Place Ingenium error message here.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010002
+                    message: UNAUTHORIZED_REQUEST
+                    description: The request has authentication error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010003
+                    message: FORBIDDEN_REQUEST
+                    description: >-
+                      The request does not have sufficient rights to perform
+                      this operation on the requested resource.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010004
+                    message: RESOURCE_NOT_FOUND
+                    description: The requested resource was not found.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010005
+                    message: INTERNAL_SERVER_ERRPR
+                    description: Internal Server Error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+      deprecated: false
+      security:
+        - dev-api-scope:
+            - apiplatform.asia.policyservice.vul.uad
+        - sit-api-scope:
+            - apiplatform.asia.policyservice.vul.uad
+        - uat-api-scope:
+            - apiplatform.asia.policyservice.vul.uad
+        - prod-api-scope:
+            - apiplatform.asia.policyservice.vul.uad
+  /policy/{referenceNo}/vul/switch:
+    post:
+      tags:
+        - fund-transactions
+      summary: File VUL Fund Switch
+      description: File VUL Fund Switch request via Ingenium Webservice
+      operationId: vulFundSwitch
+      requestBody:
+        $ref: '#/components/requestBodies/PostVULSwitchRequest'
+      parameters:
+        - $ref: '#/components/parameters/x-traceability-id'
+        - $ref: '#/components/parameters/x-correlation-id'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/referenceNo'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+              example:
+                data: null
+                notifications:
+                  - code: 201
+                    message: Success
+                    description: The request was successfully submitted
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '400':
+          description: Request validation error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010001
+                    message: REQUEST_VALIDATION_ERROR
+                    description: Place Ingenium error message here.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010002
+                    message: UNAUTHORIZED_REQUEST
+                    description: The request has authentication error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010003
+                    message: FORBIDDEN_REQUEST
+                    description: >-
+                      The request does not have sufficient rights to perform
+                      this operation on the requested resource.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010004
+                    message: RESOURCE_NOT_FOUND
+                    description: The requested resource was not found.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010005
+                    message: INTERNAL_SERVER_ERRPR
+                    description: Internal Server Error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+      deprecated: false
+      security:
+        - dev-api-scope:
+            - apiplatform.asia.policyservice.vul.uad
+        - sit-api-scope:
+            - apiplatform.asia.policyservice.vul.uad
+        - uat-api-scope:
+            - apiplatform.asia.policyservice.vul.uad
+        - prod-api-scope:
+            - apiplatform.asia.policyservice.vul.uad
+  /policy/{referenceNo}/vul/transactions:
+    get:
+      tags:
+        - fund-transactions
+      summary: Retrieved VUL transaction details via Ingenium DB
+      description: Retrieve VUL transaction details via Ingenium DB
+      operationId: getVULTransactions
+      parameters:
+        - $ref: '#/components/parameters/x-traceability-id'
+        - $ref: '#/components/parameters/x-correlation-id'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/referenceNo'
+        - $ref: '#/components/parameters/companyCodeHeader'
+        - $ref: '#/components/parameters/effectiveDateHeader'
+        - $ref: '#/components/parameters/transactionAmountHeader'
+        - $ref: '#/components/parameters/transactionFeeHeader'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyVulFundsDto'
+              example:
+                data:
+                  referenceNo: '0809986876'
+                  osAmount: '2000.00'
+                  tranchIndicator: 'N'
+                  maxSwitchCount: '2'
+                  withdrawFeePercentage: '1.00'
+                  completedWithdrawCountCurrentYear: '0'
+                  completedSwitchCountCurrentYear: '0'
+                  deferredWithdrawCountCurrentYear: '0'
+                  deferredSwitchCountCurrentYear: '2'
+                  freeLookEndDate: '2019-05-24'
+                  deferredTransactions:
+                    - transactionNumber: '99997'
+                      effectiveDate: '2019-10-02'
+                      transactionType: W
+                      transactionGrossAmount: '5400.00'
+                      transactionNetAmount: '5400.00'
+                      transactionFee: '0.00'
+                      fundId: SLPBA
+                      transactionAmountPerFundId: '5000.00'
+                    - transactionNumber: '99996'
+                      effectiveDate: '2019-10-02'
+                      transactionFee: null
+                      fundId: SLPBA
+                      transactionType: T
+                      transactionGrossAmount: null
+                      transactionNetAmount: null
+                      transactionAmountPerFundId: null
+                notifications:
+                  - code: 200
+                    message: Success
+                    description: The request was successfully submitted
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '400':
+          description: Request validation error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010001
+                    message: REQUEST_VALIDATION_ERROR
+                    description: The request has invalid data.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010002
+                    message: UNAUTHORIZED_REQUEST
+                    description: The request has authentication error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010003
+                    message: FORBIDDEN_REQUEST
+                    description: >-
+                      The request does not have sufficient rights to perform
+                      this operation on the requested resource.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010004
+                    message: RESOURCE_NOT_FOUND
+                    description: The requested resource was not found.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010005
+                    message: INTERNAL_SERVER_ERRPR
+                    description: Internal Server Error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+      deprecated: false
+      security:
+        - dev-api-scope:
+            - apiplatform.asia.policyservice.vul.read
+        - sit-api-scope:
+            - apiplatform.asia.policyservice.vul.read
+        - uat-api-scope:
+            - apiplatform.asia.policyservice.vul.read
+        - prod-api-scope:
+            - apiplatform.asia.policyservice.vul.read
+  /eligibility:
+    post:
+      tags:
+        - policy-eligibility-controller
+      summary: Check client eligibility
+      description: >
+        Check client eligibility using ingenium calls infoToCheck field supports
+        the following values:
+         1. NATIONALITY - data will follow NationalityInfo Schema
+         2. PRESENT_ADDRESS - data will follow AddressInfo Schema
+         3. PERMANENT_ADDRESS - data will follow AddressInfo Schema
+         4. OCCUPATION - data will follow OccupationInfo Schema
+         5. NATURE_OF_BUSINESS - data will follow NatureOfBusinessInfo Schema
+         6. BUSINESS_ADDRESS - data will follow AddressInfo Schema
+      operationId: checkEligibility
+      requestBody:
+        $ref: '#/components/requestBodies/PostEligibilityRequest'
+      parameters:
+        - $ref: '#/components/parameters/x-traceability-id'
+        - $ref: '#/components/parameters/x-correlation-id'
+        - $ref: '#/components/parameters/x-auth-token'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    description: >-
+                      Contains response from ingenium for eligibility call and
+                      overall result if eligible
+                    properties:
+                      isEligible:
+                        type: boolean
+                      endpoints:
+                        type: object
+                        properties:
+                          endpoint:
+                            type: string
+                            example: ForeignResidenceInquiry
+                          sourceSystem:
+                            type: string
+                            example: ingenium
+                          sourceSystemResponse:
+                            type: object
+                  notifications:
+                    $ref: '#/components/schemas/Notification'
+                example:
+                  data:
+                    - isEligble: true
+                      results:
+                        - endpoint: OccupationTableInquiry
+                          sourceSystem: ingenium
+                          sourceSystemResponse:
+                            OLifE:
+                              OccupationTableData:
+                                MirOccpId: ACCOUNT
+                                MirOccpPlanId: CISP3A
+                                MirSstdRatQty: '00.00000'
+                                MirUwgDecnCdG:
+                                  MirUwgDecnCdT: S
+                  notifications:
+                    - code: 201
+                      message: Success
+                      description: The request was successfully submitted
+                      timestamp: '2020-09-25T17:55:04.28'
+        '400':
+          description: Request validation error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010001
+                    message: REQUEST_VALIDATION_ERROR
+                    description: Place Ingenium error message here.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010002
+                    message: UNAUTHORIZED_REQUEST
+                    description: The request has authentication error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010003
+                    message: FORBIDDEN_REQUEST
+                    description: >-
+                      The request does not have sufficient rights to perform
+                      this operation on the requested resource.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010004
+                    message: RESOURCE_NOT_FOUND
+                    description: The requested resource was not found.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010005
+                    message: INTERNAL_SERVER_ERRPR
+                    description: Internal Server Error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+      deprecated: false
+      security:
+        - dev-api-scope:
+            - apiplatform.asia.policyservice.eligibility.uad
+        - sit-api-scope:
+            - apiplatform.asia.policyservice.eligibility.uad
+        - uat-api-scope:
+            - apiplatform.asia.policyservice.eligibility.uad
+        - prod-api-scope:
+            - apiplatform.asia.policyservice.eligibility.uad
+  /auto/appraisal:
+    post:
+      tags:
+        - policy-creation-controller
+      summary: Policy Appraisal
+      description: Call ingenium endpoints in order to perform appraisal of the policy
+      operationId: autoAppraisal
+      requestBody:
+        $ref: '#/components/requestBodies/PostAutoAppraisalRequest'
+      parameters:
+        - $ref: '#/components/parameters/x-traceability-id'
+        - $ref: '#/components/parameters/x-correlation-id'
+        - $ref: '#/components/parameters/x-auth-token'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AutoAppraisalIngResp'
+                  notifications:
+                    $ref: '#/components/schemas/Notification'
+              example:
+                data:
+                  - endpoint: ClearCaseSubmitNoProcessing
+                    sourceSystem: ingenium
+                    sourceSystemResponse:
+                      MirUserMsgTxtT: 'ANALYSIS COMPLETE FOR POLICY: 2580102035'
+                      MirUserMsgSevrtyG: '2'
+                  - endpoint: UnderwriterDecisionUpdate
+                    sourceSystem: ingenium
+                    sourceSystemResponse:
+                      MirUserMsgTxtT: 'ANALYSIS COMPLETE FOR POLICY: 2580102035'
+                      MirUserMsgSevrtyG: '1'
+                notifications:
+                  - code: 201
+                    message: Success
+                    description: The request was successfully submitted
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '400':
+          description: Request validation error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010001
+                    message: REQUEST_VALIDATION_ERROR
+                    description: Place Ingenium error message here.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010002
+                    message: UNAUTHORIZED_REQUEST
+                    description: The request has authentication error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010003
+                    message: FORBIDDEN_REQUEST
+                    description: >-
+                      The request does not have sufficient rights to perform
+                      this operation on the requested resource.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010004
+                    message: RESOURCE_NOT_FOUND
+                    description: The requested resource was not found.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010005
+                    message: INTERNAL_SERVER_ERRPR
+                    description: Internal Server Error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+      deprecated: false
+      security:
+        - dev-api-scope:
+            - apiplatform.asia.policyservice.policy.uad
+        - sit-api-scope:
+            - apiplatform.asia.policyservice.policy.uad
+        - uat-api-scope:
+            - apiplatform.asia.policyservice.policy.uad
+        - prod-api-scope:
+            - apiplatform.asia.policyservice.policy.uad
+  /policy/{referenceNo}/disbursement:
+    post:
+      tags:
+        - fund-transactions
+      summary: File Disbursement Request
+      description: File Disbursement request via Ingenium Webservice
+      operationId: postDisbursement
+      requestBody:
+        $ref: '#/components/requestBodies/PostDisbursementRequest'
+      parameters:
+        - $ref: '#/components/parameters/x-traceability-id'
+        - $ref: '#/components/parameters/x-correlation-id'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/referenceNo'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+              example:
+                data: null
+                notifications:
+                  - code: 201
+                    message: Success
+                    description: The request was successfully submitted
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '400':
+          description: Request validation error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010001
+                    message: REQUEST_VALIDATION_ERROR
+                    description: Place Ingenium error message here.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010002
+                    message: UNAUTHORIZED_REQUEST
+                    description: The request has authentication error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010003
+                    message: FORBIDDEN_REQUEST
+                    description: >-
+                      The request does not have sufficient rights to perform
+                      this operation on the requested resource.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010004
+                    message: RESOURCE_NOT_FOUND
+                    description: The requested resource was not found.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010005
+                    message: INTERNAL_SERVER_ERRPR
+                    description: Internal Server Error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+      deprecated: false
+      security:
+        - dev-api-scope:
+            - apiplatform.asia.policyservice.policy.uad
+        - sit-api-scope:
+            - apiplatform.asia.policyservice.policy.uad
+        - uat-api-scope:
+            - apiplatform.asia.policyservice.policy.uad
+        - prod-api-scope:
+            - apiplatform.asia.policyservice.policy.uad
+  /policy/cta-tagging:
+    post:
+      tags:
+        - fund-transactions
+      summary: Credit-To-Account Tagging
+      description: >-
+        Update CTA Tagging via Ingenium Webservice - CreditToAccountCreate and
+        CreditToAccountDelete
+      operationId: postCtaTagging
+      requestBody:
+        $ref: '#/components/requestBodies/PostCtaRequest'
+      parameters:
+        - $ref: '#/components/parameters/x-traceability-id'
+        - $ref: '#/components/parameters/x-correlation-id'
+        - $ref: '#/components/parameters/x-auth-token'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+              example:
+                data: null
+                notifications:
+                  - code: 201
+                    message: Success
+                    description: The request was successfully submitted
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '400':
+          description: Request validation error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010001
+                    message: REQUEST_VALIDATION_ERROR
+                    description: Place Ingenium error message here.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010002
+                    message: UNAUTHORIZED_REQUEST
+                    description: The request has authentication error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010003
+                    message: FORBIDDEN_REQUEST
+                    description: >-
+                      The request does not have sufficient rights to perform
+                      this operation on the requested resource.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010004
+                    message: RESOURCE_NOT_FOUND
+                    description: The requested resource was not found.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010005
+                    message: INTERNAL_SERVER_ERRPR
+                    description: Internal Server Error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+      deprecated: false
+      security:
+        - dev-api-scope:
+            - apiplatform.asia.policyservice.policy.uad
+        - sit-api-scope:
+            - apiplatform.asia.policyservice.policy.uad
+        - uat-api-scope:
+            - apiplatform.asia.policyservice.policy.uad
+        - prod-api-scope:
+            - apiplatform.asia.policyservice.policy.uad
+  /policy/{referenceNo}/vul/eligible-switch-funds:
+    get:
+      tags:
+        - fund-transactions
+      summary: Retrieved eligible switch funds
+      description: >-
+        Retrieve eligible funds what a policy can switch funds to. These are
+        retrieved from Ingenium DB
+      operationId: getEligibleSwitchFunds
+      parameters:
+        - $ref: '#/components/parameters/x-traceability-id'
+        - $ref: '#/components/parameters/x-correlation-id'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/referenceNo'
+        - $ref: '#/components/parameters/companyCode'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EligibleSwitchFundsRs'
+              example:
+                data:
+                  - policyNumber: '0809986876'
+                    planId: ML1P1A
+                    fundId: ''
+                    fundName: ''
+                  - policyNumber: '0809986876'
+                    planId: ML1P1B
+                    fundId: ''
+                    fundName: ''
+                notifications:
+                  - code: 200
+                    message: Success
+                    description: The request was successfully submitted
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '400':
+          description: Request validation error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010001
+                    message: REQUEST_VALIDATION_ERROR
+                    description: The request has invalid data.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010002
+                    message: UNAUTHORIZED_REQUEST
+                    description: The request has authentication error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010003
+                    message: FORBIDDEN_REQUEST
+                    description: >-
+                      The request does not have sufficient rights to perform
+                      this operation on the requested resource.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010004
+                    message: RESOURCE_NOT_FOUND
+                    description: The requested resource was not found.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/EmptyDataResponse
+              example:
+                data: null
+                notifications:
+                  - code: ERR00010005
+                    message: INTERNAL_SERVER_ERRPR
+                    description: Internal Server Error.
+                    timestamp: 2020-09-25T17:55:04.288+0000
+                    metadata: null
+      deprecated: false
+      security:
+        - dev-api-scope:
+            - apiplatform.asia.policyservice.vul.read
+        - sit-api-scope:
+            - apiplatform.asia.policyservice.vul.read
+        - uat-api-scope:
+            - apiplatform.asia.policyservice.vul.read
+        - prod-api-scope:
+            - apiplatform.asia.policyservice.vul.read
+components:
+  parameters:
+    x-traceability-id:
+      name: x-traceability-id
+      description: Common header parameters for centeralized logging.
+      in: header
+      required: true
+      schema:
+        type: string
+        example: p0kkv9
+    x-correlation-id:
+      name: x-correlation-id
+      description: >-
+        Unique correlation ID which is either passed by consumer or generated as
+        UUID.
+      in: header
+      required: true
+      schema:
+        type: string
+        example: 4hjm0k
+    x-auth-token:
+      name: Authorization
+      description: OAuth2 token generated by OKTA.
+      in: header
+      required: true
+      schema:
+        type: string
+        example: >-
+          Bearer
+          eyJraWQiOiJWdTVKWEpJaUhhcnFqX3drUGtCSUlKd1ZFeGxHTy0yLTlGaXBTUm8ySUtVIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULmNFM2xYc0hYQnNQVDIyZGR6SE9YbXVsU1NGTEp1czZXSDNDUzVUTkxaVEEiLCJpc3MiOiJodHRwczovL3N1bmxpZmVhc2lhYXBpLm9rdGFwcmV2aWV3LmNvbS9vYXV0aDIvYXVzMTNlZDh1Z0M5RVZHb1MxZDciLCJhdWQiOiJkZXYuYXNpYS5kaWdpdGFsc29sdXRpb25zLnN1bmxpZmVhc2lhYXBpLm9rdGFwcmV2aWV3LmNvbSIsImlhdCI6MTcxOTIwOTU3MSwiZXhwIjoxNzE5MjEzMTcxLCJjaWQiOiIwb2EzbmlpcXg3amltd21DMzFkNyIsInNjcCI6WyJhcGlwbGF0Zm9ybS5hc2lhLnBvbGljeXNlcnZpY2UucG9saWN5LnJlYWQiXSwic3ViIjoiMG9hM25paXF4N2ppbXdtQzMxZDcifQ.dZoppdGWiqoXGiaESzyFyUcSsUl7tqvfQZ7Py_kTzEgXvIC54_-wLkiWhMfQKsbZfvS4HwWwF_s6E6Ot4ZAEqxIoDoKwpxOZtyiJpkOfbO13bgHH83sXWPxCHFMBcb_xKfe_gpGU_D0jeuWM-UEr3401sThXaj7VaM76L5Eua43dvdGfuXxMdM820mkfehmBike62KRtrGgtD8z5L62NCXUdZNwwNuO6pMu5OZ0W6r67m0iUt1j1BsI5Bw6t4ICSFj7TzrH77Qv-pdE9jHt6dmtp5pRmwYH__Vqj3lMBNSO-qzolUhhcT8m3m4iuvSaL0Tk1t7WsI5m6HbpRxankYA
+    policyNumbers:
+      name: policyNumbers
+      description: >-
+        Serves as the list of reference numbers. Comma separated for multiple
+        reference numbers
+      in: header
+      required: true
+      schema:
+        type: string
+        example: 123,456,789
+    optimized:
+      name: optimized
+      description: >-
+        This identifies if the return value should be optimized or not. If
+        parameter is not defined, return the DetailedPoliciesInfo
+      in: query
+      required: false
+      schema:
+        type: boolean
+    referenceNo:
+      name: referenceNo
+      description: Serves as the referenceNo
+      in: path
+      required: true
+      schema:
+        type: string
+        example: Swp3iXOXSpKMKAT29rPam
+    sequenceNumber:
+      name: sequenceNumber
+      description: Beneficiary sequence number generated by Ingenium Webservice
+      in: path
+      required: true
+      schema:
+        type: string
+        example: Swp3iXOXSpKMKAT29rPam
+    companyCode:
+      name: companyCode
+      description: >-
+        Company code to determine which Ingenium Webservice will be called. e.g.
+        SLOCPI, SLGFI
+      in: query
+      required: true
+      schema:
+        type: string
+        example: SLOCPI
+    companyCodeHeader:
+      name: companyCode
+      description: >-
+        Company code to determine which Ingenium Webservice will be called. e.g.
+        SLOCPI, SLGFI
+      in: header
+      required: false
+      schema:
+        type: string
+        example: SLOCPI
+    effectiveDateHeader:
+      name: effectiveDate
+      description: Effective date of request
+      in: header
+      required: false
+      schema:
+        type: string
+        example: '2019-09-04'
+    transactionAmountHeader:
+      name: transactionAmount
+      description: Transaction amount
+      in: header
+      required: false
+      schema:
+        type: string
+        example: '6000'
+    transactionFeeHeader:
+      name: transactionFee
+      description: Transaction fee
+      in: header
+      required: false
+      schema:
+        type: string
+        example: '50'
+    correlation-id:
+      name: correlation-id
+      description: Serves as the transaction id that is used for logging.
+      in: header
+      required: true
+      schema:
+        type: string
+        example: Swp3iXOXSpKMKAT29rPam
+    version:
+      name: version
+      description: >-
+        Version of the API's service implementation. Defaults to "0" if not
+        passed.
+      in: query
+      required: false
+      schema:
+        type: string
+        example: 1
+    relTypeCd:
+      name: relTypeCd
+      description: RelTypeCd for assignee
+      in: query
+      required: false
+      schema:
+        type: string
+        example: A
+        maxLength: 2
+  requestBodies:
+    PostBeneficiaryRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PostBeneficiaryRq'
+    PutBeneficiaryRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PutBeneficiaryRq'
+    PostVULWithdrawRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PostVULWithdrawRq'
+    PostVULSwitchRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PostVULSwitchRq'
+    PostDisbursementRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PostDisbursementRq'
+    PostCtaRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PostCtaRq'
+    PostEligibilityRequest:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - companyCode
+              - infoToCheck
+              - info
+            properties:
+              companyCode:
+                type: string
+                example: SLGFI
+              infoToCheck:
+                type: string
+                enum:
+                  - NATIONALITY
+                  - PRESENT_ADDRESS
+                  - PERMANENT_ADDRESS
+                  - OCCUPATION
+                  - NATURE_OF_BUSINESS
+                  - BUSINESS_ADDRESS
+                example: PRESENT_ADDRESS
+              info:
+                anyOf:
+                  - $ref: '#/components/schemas/AddressInfo'
+                  - $ref: '#/components/schemas/NationalityInfo'
+                  - $ref: '#/components/schemas/OccupationInfo'
+                  - $ref: '#/components/schemas/NatureOfBusinessInfo'
+          examples:
+            PRESENT_ADDRESS:
+              value:
+                companyCode: SLGFI
+                infoToCheck: PRESENT_ADDRESS
+                info:
+                  province: MM
+                  city: MM
+                  zip: '1234'
+                  country: PH
+                  planCode: RA1P0B
+            PERMANENT_ADDRESS:
+              value:
+                companyCode: SLGFI
+                infoToCheck: PERMANENT_ADDRESS
+                info:
+                  province: MM
+                  city: MM
+                  zip: '1234'
+                  country: PH
+                  planCode: RA1P0B
+            NATIONALITY:
+              value:
+                companyCode: SLGFI
+                infoToCheck: NATIONALITY
+                info:
+                  citizenship: PH
+                  planCode: RA1P0B
+            OCCUPATION:
+              value:
+                companyCode: SLGFI
+                infoToCheck: OCCUPATION
+                info:
+                  occupation: ADMINISTRATOR
+                  planCode: RA1P0B
+            NATURE_OF_BUSINESS:
+              value:
+                companyCode: SLGFI
+                infoToCheck: NATURE_OF_BUSINESS
+                info:
+                  natureOfBusiness: Banking
+            BUSINESS_ADDRESS:
+              value:
+                companyCode: SLGFI
+                infoToCheck: PRESENT_ADDRESS
+                info:
+                  province: MM
+                  city: MM
+                  zip: '1234'
+                  country: PH
+                  planCode: RA1P0B
+    PostPolicyRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreatePolicyDto'
+    PostAutoAppraisalRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AutoAppraisalDto'
+  schemas:
+    PostBeneficiaryRs:
+      title: Add beneficiary response object
+      type: object
+      properties:
+        sequenceNumber:
+          type: string
+    DeleteBeneficiaryRq:
+      type: object
+      properties:
+        policyNumber:
+          type: string
+          example: '03193849'
+        sequenceNumber:
+          type: string
+          example: '027'
+    PutBeneficiaryRq:
+      type: object
+      properties:
+        policyNumber:
+          type: string
+          example: 30331822
+        companyCode:
+          type: string
+          example: SLOCPI
+        beneficiaryList:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/NewBeneficiaryDto'
+              - type: object
+                properties:
+                  sequenceNumber:
+                    type: string
+                    example: '027'
+    PostBeneficiaryRq:
+      title: Add beneficiary request parameter
+      type: object
+      properties:
+        policyNumber:
+          type: string
+          example: 30331822
+        companyCode:
+          type: string
+          example: SLOCPI
+        beneficiaryList:
+          type: array
+          items:
+            $ref: '#/components/schemas/NewBeneficiaryDto'
+    PostCtaRq:
+      title: CTA Tagging request parameter
+      type: object
+      properties:
+        adminSysClientNo:
+          type: string
+          example: 30331822
+        companyCode:
+          type: string
+          example: SLOCPI
+        policyCurrency:
+          type: string
+          example: PS
+        ctaType:
+          type: string
+          example: T
+        taggingType:
+          type: string
+          example: SAVE
+    PostDisbursementRq:
+      title: Disbursement request parameter
+      type: object
+      properties:
+        policyNumber:
+          type: string
+          example: 30331822
+        companyCode:
+          type: string
+          example: SLOCPI
+        policyCurrency:
+          type: string
+          example: PS
+        clientOwnerName:
+          type: string
+          maxLength: 90
+          example: John Doe
+        disbursementAmount:
+          type: string
+          example: '7000.00'
+        approver:
+          type: string
+          example: ''
+        transactionType:
+          type: string
+          example: VUL3
+        disbursementType:
+          type: string
+          example: C
+    PostVULSwitchRq:
+      title: VUL Switch request parameter
+      type: object
+      properties:
+        policyNumber:
+          type: string
+          example: 30331822
+        companyCode:
+          type: string
+          example: SLOCPI
+        policyCurrency:
+          type: string
+          example: PS
+        switchMethod:
+          type: string
+          example: amount | percentage
+        switchToNewFund:
+          type: object
+          nullable: true
+          properties:
+            planId:
+              type: string
+              example: FLRP1B
+            policyStatusCd:
+              type: string
+              example: '1'
+            fundContractStatusCd:
+              type: string
+              example: A
+            coverageStatusCd:
+              type: string
+              example: '1'
+            fundCounter:
+              type: array
+              items:
+                type: string
+                example: '001'
+            fundId:
+              type: array
+              items:
+                type: string
+                example: SLPBA
+            fundStatus:
+              type: array
+              items:
+                type: string
+                example: A
+        transferCharge:
+          type: string
+          example: '57.5'
+        effectiveDate:
+          type: string
+          example: '2019-09-10'
+        fundCounter:
+          type: array
+          items:
+            type: string
+            example: '001'
+        fundId:
+          type: array
+          items:
+            type: string
+            example: abc
+        switchFromAmount:
+          type: array
+          items:
+            type: string
+            example: '7000.00'
+        switchToAmount:
+          type: array
+          items:
+            type: string
+            example: '7000.00'
+    PostVULWithdrawRq:
+      title: VUL Withdraw request parameter
+      type: object
+      properties:
+        policyNumber:
+          type: string
+          example: 30331822
+        companyCode:
+          type: string
+          example: SLOCPI
+        policyCurrency:
+          type: string
+          example: PS
+        effectiveDate:
+          type: string
+          example: '2019-09-10'
+        totalSurrenderAmount:
+          type: string
+          example: '7000.00'
+        surrenderAmount:
+          type: array
+          items:
+            type: string
+            example: '7000.00'
+        surrenderCharge:
+          type: string
+          example: '57.5'
+        fundId:
+          type: array
+          items:
+            type: string
+            example: abc
+        withdrawMethod:
+          type: string
+          example: total
+    BaseResponse:
+      description: API Base Response
+      type: object
+      properties:
+        data:
+          type: object
+          description: Data result
+          anyOf:
+            - $ref: '#/components/schemas/PostBeneficiaryRs'
+        notifications:
+          type: object
+          description: Status of the request
+          anyOf:
+            - $ref: '#/components/schemas/Notification'
+    Notification:
+      description: API Notification Success
+      type: object
+      properties:
+        code:
+          type: string
+          description: The status code
+        message:
+          type: string
+          description: The status message
+        description:
+          type: string
+          description: The status description
+        timestamp:
+          type: string
+          description: The timestamp
+        metadata:
+          type: string
+          description: The metadata
+    PolicyVulFundsDto:
+      type: object
+      properties:
+        referenceNo:
+          type: string
+        fundDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/FundDetailsDto'
+    EligibleSwitchFundsRs:
+      type: object
+      properties:
+        policyNumber:
+          type: string
+        planId:
+          type: string
+        fundId:
+          type: string
+        fundName:
+          type: string
+    PolicyInfosDto:
+      type: object
+      properties:
+        policyNumber:
+          type: string
+        productName:
+          type: string
+        productCode:
+          type: string
+        insuranceType:
+          type: string
+        issueDate:
+          type: string
+          format: date
+        inforceDate:
+          type: string
+        currency:
+          type: string
+        faceAmount:
+          type: number
+          format: double
+        policyDuration:
+          type: string
+        policyStatusCd:
+          type: string
+        policyStatusDesc:
+          type: string
+        billTypeCd:
+          type: string
+        billTypeDesc:
+          type: string
+        billModeCd:
+          type: string
+        billModeDesc:
+          type: string
+        premiumDueDate:
+          type: string
+          format: date
+        nfoOptCd:
+          type: string
+        prepaidAmount:
+          type: number
+          format: double
+        premOffsetCd:
+          type: string
+        premOffsetDt:
+          type: string
+          format: date
+        sundryAmount:
+          type: number
+          format: double
+        totalAmountDue:
+          type: number
+          format: double
+        totalFundValue:
+          type: number
+          format: double
+        fundValueAsOfIssueDate:
+          type: string
+          format: date
+        sumAssured:
+          type: number
+          format: double
+        lastDeposit:
+          type: number
+          format: double
+        lastDepositDate:
+          type: string
+          format: date
+        lapseStrtDate:
+          type: string
+          format: date
+        totalInsuranceCvg:
+          type: number
+          format: double
+        premiumAmount:
+          type: number
+          format: double
+        modalPremium:
+          type: number
+          format: double
+        loanIntrestInAdv:
+          type: number
+          format: double
+        insuredName:
+          type: string
+        insuredGenderCd:
+          type: string
+        insuredGender:
+          type: string
+        insuredSmokerCd:
+          type: string
+        insuredSmokerDesc:
+          type: string
+        insuredBirthdate:
+          type: string
+          format: date
+        insuredOccupation:
+          type: string
+        insuredMaritalStatusCd:
+          type: string
+        insuredMaritalStatusDesc:
+          type: string
+        beneficiaryInstructions:
+          type: string
+        coverageAsOfDate:
+          type: string
+          format: date
+        coverageDetailList:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoverageDetailsDto'
+        beneficiaryList:
+          type: array
+          items:
+            $ref: '#/components/schemas/BeneficiaryListsDto'
+        dividendEndowmentInformation:
+          type: array
+          items:
+            $ref: '#/components/schemas/DivEndowInfoDto'
+        planPayoutList:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlanPayoutListDto'
+        servicingAdvisor:
+          type: string
+        loanInterestRate:
+          type: number
+          format: double
+        insuredAgeAtIssueDate:
+          type: string
+        insuredBirthLocation:
+          type: string
+        osDisbursementAmount:
+          type: number
+          format: double
+      title: PolicyInfosDto
+    FundDetailsDto:
+      type: object
+      properties:
+        fundCd:
+          type: string
+        fundName:
+          type: string
+        units:
+          type: number
+          format: double
+        fundValueAmount:
+          type: number
+          format: double
+        fundAllocation:
+          type: string
+        unitPrice:
+          type: number
+          format: double
+        fundValueAsofDate:
+          type: string
+          format: date
+    PolicyDerivedInfosDto:
+      type: object
+      properties:
+        policyNumber:
+          type: string
+        billingAddress:
+          type: string
+        premiumDueDate:
+          type: string
+          format: date
+        prevPremiumDueDate:
+          type: string
+          format: date
+        billToDate:
+          type: string
+          format: date
+        loanInterestInAdv:
+          type: number
+          format: double
+        totalFundValue:
+          type: number
+          format: double
+        totalFundValueAsOfDate:
+          type: string
+          format: date
+        cashValue:
+          type: number
+          format: double
+        cashValueDate:
+          type: string
+          format: date
+        cashSurrenderValue:
+          type: number
+          format: double
+        cashSurrenderValueDate:
+          type: string
+          format: date
+        loanBalance:
+          type: number
+          format: double
+        maxLoanableAmount:
+          type: number
+          format: double
+        endowmentOptCd:
+          type: string
+        endowmentOptDesc:
+          type: string
+        premiumAmount:
+          type: number
+          format: double
+        dividendValue:
+          type: number
+          format: double
+        dividendValuePua:
+          type: number
+          format: double
+        osDisbursement:
+          type: number
+          format: double
+        premiumOffsetCode:
+          type: string
+        nonForfeitureCode:
+          type: string
+        reinsuranceCode:
+          type: string
+        singlePremiumPaid:
+          type: number
+          format: double
+        currentAnnualPremium:
+          type: number
+          format: double
+        totalExcessPremium:
+          type: number
+          format: double
+        totalFundWithdrawals:
+          type: number
+          format: double
+      title: PolicyDerivedInfosDto
+    NonDerivedPolicyInfo:
+      anyOf:
+        - $ref: '#/components/schemas/PoliciesInfoDto'
+        - $ref: '#/components/schemas/SummPoliciesInfoDto'
+    PoliciesInfoDto:
+      type: array
+      items:
+        $ref: '#/components/schemas/DetailedPoliciesInfoDto'
+    DetailedPoliciesInfoDto:
+      type: object
+      properties:
+        policyNumber:
+          type: string
+        productName:
+          type: string
+        productCode:
+          type: string
+        insuranceType:
+          type: string
+        issueDate:
+          type: string
+          format: date
+        currency:
+          type: string
+        faceAmount:
+          type: number
+          format: double
+        policyDuration:
+          type: string
+        policyStatusCd:
+          type: string
+        policyStatusDesc:
+          type: string
+        billTypeCd:
+          type: string
+        billTypeDesc:
+          type: string
+        billModeCd:
+          type: string
+        billModeDesc:
+          type: string
+        premiumDueDate:
+          type: string
+          format: date
+        nfoOptCd:
+          type: string
+        paidToDate:
+          type: string
+        commentsRemarks:
+          type: string
+        prepaidAmount:
+          type: number
+          format: double
+        premOffsetCd:
+          type: string
+        premOffsetDt:
+          type: string
+          format: date
+        sundryAmount:
+          type: number
+          format: double
+        totalAmountDue:
+          type: number
+          format: double
+        fundValueAsOfIssueDate:
+          type: string
+          format: date
+        sumAssured:
+          type: number
+          format: double
+        freezeOrder:
+          type: string
+        lastDeposit:
+          type: number
+          format: double
+        lastDepositDate:
+          type: string
+          format: date
+        lapseStrtDate:
+          type: string
+          format: date
+        totalInsuranceCvg:
+          type: number
+          format: double
+        premiumAmount:
+          type: number
+          format: double
+        modalPremium:
+          type: number
+          format: double
+        lastmodePremium:
+          type: number
+          format: double
+        embedded:
+          type: boolean
+          nullable: true
+        insuredId:
+          type: string
+          nullable: true
+        insuredEffectiveDate:
+          type: string
+          format: date
+        insuredFirstName:
+          type: string
+          nullable: true
+        insuredMiddleName:
+          type: string
+          nullable: true
+        insuredLastName:
+          type: string
+          nullable: true
+        insuredName:
+          type: string
+        insuredRelationshipDesc:
+          type: string
+        insuredGenderCd:
+          type: string
+        insuredGender:
+          type: string
+        insuredSmokerCd:
+          type: string
+        insuredSmokerDesc:
+          type: string
+        insuredBirthdate:
+          type: string
+          format: date
+        insuredBirthLocation:
+          type: string
+        insuredOccupation:
+          type: string
+        insuredMaritalStatus:
+          type: string
+        insuredCitizenship1:
+          type: string
+        insuredCitizenship2:
+          type: string
+        insuredCitizenship3:
+          type: string
+        insuredCompanyName:
+          type: string
+        insuredLegalName:
+          type: string
+        insuredHomePhoneNumber:
+          type: string
+          nullable: true
+        insuredBusinessPhoneNumber:
+          type: string
+          nullable: true
+        insuredMobileNumber:
+          type: string
+          nullable: true
+        insuredEmail:
+          type: string
+          nullable: true
+        insuredCompleteAddress:
+          type: string
+          nullable: true
+        beneficiaryInstructions:
+          type: string
+        coverageAsOfDate:
+          type: string
+          format: date
+        coverageDetailList:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoverageDetailsDto'
+        beneficiaryList:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/BeneficiaryListsDto'
+              - type: object
+                properties:
+                  sequenceNumber:
+                    type: string
+                    example: '1'
+                  coverageNumber:
+                    type: string
+                  beneficiaryProceeds:
+                    type: string
+                  beneficiarySexCd:
+                    type: string
+                    example: F
+                  beneficiaryCitizenship:
+                    type: string
+                    example: FIL
+                  beneficiaryBirthCountryCd:
+                    type: string
+                    example: PH
+                  beneficiaryAddrLine1:
+                    type: string
+                    example: Address Line 1
+                  beneficiaryAddrLine2:
+                    type: string
+                    example: Address Line 2
+                  beneficiaryAddrLine3:
+                    type: string
+                    example: Address Line 3
+                  beneficiaryAddrCountryCd:
+                    type: string
+                    example: AC
+                  beneficiaryAddrCity:
+                    type: string
+                    example: Test City
+                  beneficiaryProvinceCd:
+                    type: string
+                    example: BS
+                  beneficiaryPostalCd:
+                    type: string
+                    example: '1111'
+                  homeNoCountryCd:
+                    type: string
+                    example: '0063'
+                  homeNoAreaCd:
+                    type: string
+                    example: '0062'
+                  homeNo:
+                    type: string
+                    example: '321321333'
+                  mobileNoCountryCd:
+                    type: string
+                    example: '0063'
+                  mobileNoAreaCd:
+                    type: string
+                    example: '0062'
+                  mobileNo:
+                    type: string
+                    example: '321321333'
+        dividendEndowmentInformation:
+          type: array
+          items:
+            $ref: '#/components/schemas/DivEndowInfoDto'
+        planPayoutList:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlanPayoutListDto'
+        insuredAddressDetails:
+          type: object
+          properties:
+            addressLine1:
+              type: string
+            addressLine2:
+              type: string
+            addressLine3:
+              type: string
+            zipCode:
+              type: string
+            city:
+              type: string
+            country:
+              type: string
+            province:
+              type: string
+        policyOwner:
+          type: object
+          properties:
+            schema:
+              $ref: '#/components/schemas/PolicyOwnerDto'
+        servicingAdvisor:
+          type: string
+        servicingAdvisorName:
+          type: string
+        servicingAdvisorStatusCode:
+          type: string
+        servicingAdvisorBranchName:
+          type: string
+        loanInterestRate:
+          type: number
+          format: double
+        reinstatementDate:
+          type: string
+        processDate:
+          type: string
+        osDisbursementAmount:
+          type: number
+          format: double
+        prevPremiumAmount:
+          type: string
+        pdfSuspenseAmount:
+          type: string
+        reinsuranceCode:
+          type: string
+        trusteeName:
+          type: string
+        insuredAgeAtIssueDate:
+          type: string
+      title: PolicyInfosDto
+    PolicyBillingDto:
+      type: object
+      properties:
+        referenceNo:
+          type: string
+        totalAmountDue:
+          type: number
+          format: double
+        premiumDueDate:
+          type: string
+          format: date
+        paymentMode:
+          type: string
+        premiumAmount:
+          type: number
+          format: double
+        currency:
+          type: string
+        billingType:
+          type: string
+        lastPaymentDate:
+          type: string
+          format: date
+        sundryAmount:
+          type: number
+          format: double
+        showAdminBilling:
+          type: boolean
+        adminBillingAmount:
+          type: number
+          format: double
+    PolicyOwnerDto:
+      type: object
+      properties:
+        clientId:
+          type: string
+        name:
+          type: string
+        birthday:
+          type: string
+        birthLocation:
+          type: string
+        sex:
+          type: string
+        smoker:
+          type: string
+        maritalStatus:
+          type: string
+        citizenship1:
+          type: string
+        citizenship2:
+          type: string
+        citizenship3:
+          type: string
+        effectiveDate:
+          type: string
+        companyName:
+          type: string
+        legalName:
+          type: string
+        billingName:
+          type: string
+        addressLine1:
+          type: string
+    CoverageDetailsDto:
+      type: object
+      properties:
+        effectiveDate:
+          type: string
+          format: date
+        policyRiderCode:
+          type: string
+        policyRiderName:
+          type: string
+        coverageNum:
+          type: string
+        coverageStatusCd:
+          type: string
+        coverageStatus:
+          type: string
+        coverageFaceAmount:
+          type: number
+          format: double
+        maturityDate:
+          type: string
+          format: date
+        benefitType:
+          type: string
+        embeded:
+          type: string
+      title: CoverageDetailsDto
+    NewBeneficiaryDto:
+      type: object
+      properties:
+        beneficiaryName:
+          type: string
+          example: John Doe
+        proceedsPercentage:
+          type: number
+          example: 80
+        beneficiaryTypeCd:
+          type: string
+          example: I
+        beneficiaryDesignationCd:
+          type: string
+          example: P
+        beneficiaryRelationshipCd:
+          type: string
+          example: SPOUS
+        benefitTypeCd:
+          type: string
+          example: D
+        beneficiaryBirthdate:
+          type: string
+          example: '1980-01-01'
+        beneficiarySexCd:
+          type: string
+          example: F
+        beneficiaryCitizenship:
+          type: string
+          example: FIL
+        beneficiaryBirthCountryCd:
+          type: string
+          example: PH
+        beneficiaryAddrLine1:
+          type: string
+          example: Address Line 1
+        beneficiaryAddrLine2:
+          type: string
+          example: Address Line 2
+        beneficiaryAddrLine3:
+          type: string
+          example: Address Line 3
+        beneficiaryAddrCountryCd:
+          type: string
+          example: AC
+        beneficiaryAddrCity:
+          type: string
+          example: Test City
+        beneficiaryProvinceCd:
+          type: string
+          example: BS
+        beneficiaryPostalCd:
+          type: string
+          example: '1111'
+        homeNoCountryCd:
+          type: string
+          example: '0063'
+        homeNoAreaCd:
+          type: string
+          example: '0062'
+        homeNo:
+          type: string
+          example: '321321333'
+        mobileNoCountryCd:
+          type: string
+          example: '0063'
+        mobileNoAreaCd:
+          type: string
+          example: '0062'
+        mobileNo:
+          type: string
+          example: '321321333'
+    BeneficiaryListsDto:
+      type: object
+      properties:
+        beneficiaryName:
+          type: string
+        beneficiaryRelationshipCd:
+          type: string
+        beneficiaryRelationship:
+          type: string
+        beneficiaryDesignationCd:
+          type: string
+        beneficiaryDesignation:
+          type: string
+        beneficiaryIrrevocableRevocableCd:
+          type: string
+        beneficiaryIrrevocableRevocable:
+          type: string
+        beneficiaryTypeCd:
+          type: string
+        beneficiaryType:
+          type: string
+        beneficiaryPercentage:
+          type: string
+        beneficiaryBirthdate:
+          type: string
+          format: date
+      title: BeneficiaryListsDto
+    DivEndowInfoDto:
+      type: object
+      properties:
+        dividendDeclared:
+          type: number
+          format: double
+        dividendValueDate:
+          type: string
+          format: date
+        dividendOptCd:
+          type: string
+        dividendOptDesc:
+          type: string
+        dividendYear:
+          type: integer
+        accumulatedDividend:
+          type: number
+          format: double
+        accumulatedEndowmentOption:
+          type: number
+          format: double
+      title: DivEndowInfoDto
+    PlanPayoutListDto:
+      type: object
+      properties:
+        planPayoutCd:
+          type: string
+      title: PlanPayoutListDto
+    BeneficiaryListDto:
+      type: object
+      properties:
+        beneficiaryBirthdate:
+          type: string
+        beneficiaryIrrevocableRevocable:
+          type: string
+        beneficiaryName:
+          type: string
+        beneficiaryPercentage:
+          type: string
+        beneficiaryPrimaryContingent:
+          type: string
+        beneficiaryRelationship:
+          type: string
+        beneficiaryType:
+          type: string
+      title: BeneficiaryListDto
+    CoverageListDto:
+      type: object
+      properties:
+        coverageFaceAmount:
+          type: string
+        coverageNum:
+          type: string
+        coverageStatus:
+          type: string
+        coverageStatusCd:
+          type: string
+        maturityDate:
+          type: string
+        policyRiderCode:
+          type: string
+        policyRiderName:
+          type: string
+      title: CoverageListDto
+    CoverageListTradDto:
+      type: object
+      properties:
+        coverageFaceAmount:
+          type: string
+        coverageNum:
+          type: string
+        coverageStatus:
+          type: string
+        coverageStatusCd:
+          type: string
+        maturityDate:
+          type: string
+        policyRiderCode:
+          type: string
+        policyRiderName:
+          type: string
+        premiumAmount:
+          type: string
+      title: CoverageListTradDto
+    DividendEndowmentInformationDto:
+      type: object
+      properties:
+        accumulatedDividend:
+          type: string
+        accumulatedEndowmentOption:
+          type: string
+        dividendDeclared:
+          type: string
+        dividendOption:
+          type: string
+        dividendOptionCd:
+          type: string
+        dividendYear:
+          type: string
+        endowmentOption:
+          type: string
+        totalCoveragePurchased:
+          type: string
+      title: DividendEndowmentInformationDto
+    PolicyDetailsTradDto:
+      type: object
+      properties:
+        beneficiaryInstructions:
+          type: string
+        beneficiaryList:
+          type: array
+          items:
+            $ref: '#/components/schemas/BeneficiaryListDto'
+        billType:
+          type: string
+        coverageAsOfDate:
+          type: string
+        coverageList:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoverageListTradDto'
+        currency:
+          type: string
+        dividendEndowmentInformation:
+          $ref: '#/components/schemas/DividendEndowmentInformationDto'
+        faceAmount:
+          type: string
+        insuredBirthdate:
+          type: string
+        insuredFirstName:
+          type: string
+        insuredGender:
+          type: string
+        insuredLastName:
+          type: string
+        insuredMaritalStatus:
+          type: string
+        insuredMiddleName:
+          type: string
+        insuredOccupation:
+          type: string
+        insuredSmokerDesc:
+          type: string
+        insuredSuffix:
+          type: string
+        issueDate:
+          type: string
+        lapsedDate:
+          type: string
+        loanBalance:
+          type: string
+        mailingAddressLine1:
+          type: string
+        mailingAddressLine2:
+          type: string
+        mailingAddressLine3:
+          type: string
+        mailingAddressLine4:
+          type: string
+        mailingAddressLine5:
+          type: string
+        mailingCity:
+          type: string
+        mailingProv:
+          type: string
+        mailingZipCd:
+          type: string
+        maxLoanableAmount:
+          type: string
+        modalPremium:
+          type: string
+        policyAdvanceInterestRate:
+          type: string
+        policyDuration:
+          type: string
+        policyNumber:
+          type: string
+        policyStatus:
+          type: string
+        policyStatusCd:
+          type: string
+        premiumDueDate:
+          type: string
+        prevPremiumDueDate:
+          type: string
+        productCode:
+          type: string
+        productName:
+          type: string
+        sumAssured:
+          type: string
+        totalAmountDue:
+          type: string
+        cifClientNo:
+          type: string
+        cifAgentNo:
+          type: string
+      title: PolicyDetailsTradDto
+    PolicyDetailsVulDto:
+      type: object
+      properties:
+        beneficiaryInstructions:
+          type: string
+        beneficiaryList:
+          type: array
+          items:
+            $ref: '#/components/schemas/BeneficiaryListDto'
+        billType:
+          type: string
+        coverageAsOfDate:
+          type: string
+        coverageList:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoverageListDto'
+        currency:
+          type: string
+        faceAmount:
+          type: string
+        initialFundValue:
+          type: string
+        initialFundValueAsOfDate:
+          type: string
+        insuredBirthdate:
+          type: string
+        insuredFirstName:
+          type: string
+        insuredGender:
+          type: string
+        insuredLastName:
+          type: string
+        insuredMaritalStatus:
+          type: string
+        insuredMiddleName:
+          type: string
+        insuredOccupation:
+          type: string
+        insuredSmokerDesc:
+          type: string
+        insuredSuffix:
+          type: string
+        issueDate:
+          type: string
+        lapsedDate:
+          type: string
+        lastDeposit:
+          type: string
+        lastDepositDate:
+          type: string
+        mailingAddressLine1:
+          type: string
+        mailingAddressLine2:
+          type: string
+        mailingAddressLine3:
+          type: string
+        mailingAddressLine4:
+          type: string
+        mailingAddressLine5:
+          type: string
+        mailingCity:
+          type: string
+        mailingProv:
+          type: string
+        mailingZipCd:
+          type: string
+        modalPremium:
+          type: string
+        policyDuration:
+          type: string
+        policyNumber:
+          type: string
+        policyStatus:
+          type: string
+        policyStatusCd:
+          type: string
+        premiumDueDate:
+          type: string
+        prevPremiumDueDate:
+          type: string
+        productCode:
+          type: string
+        productName:
+          type: string
+        sumAssured:
+          type: string
+        totalAmountDue:
+          type: string
+        cifClientNo:
+          type: string
+        cifAgentNo:
+          type: string
+      title: PolicyDetailsVulDto
+    SummPoliciesInfoDto:
+      type: array
+      items:
+        $ref: '#/components/schemas/SummaryPoliciesInfoDto'
+    SummaryPoliciesInfoDto:
+      type: object
+      properties:
+        policyNumber:
+          type: string
+        productName:
+          type: string
+        productCode:
+          type: string
+        insuranceType:
+          type: string
+        issueDate:
+          type: string
+          format: date
+        policyStatusCd:
+          type: string
+        policyStatusDesc:
+          type: string
+        embedded:
+          type: boolean
+          nullable: true
+        insuredId:
+          type: string
+          nullable: true
+        insuredFirstName:
+          type: string
+          nullable: true
+        insuredMiddleName:
+          type: string
+          nullable: true
+        insuredLastName:
+          type: string
+          nullable: true
+        insuredName:
+          type: string
+        insuredBirthdate:
+          type: string
+          format: date
+        insuredGenderCd:
+          type: string
+        insuredGender:
+          type: string
+        insuredHomePhoneNumber:
+          type: string
+          nullable: true
+        insuredBusinessPhoneNumber:
+          type: string
+          nullable: true
+        insuredMobileNumber:
+          type: string
+          nullable: true
+        insuredEmail:
+          type: string
+          nullable: true
+        insuredCompleteAddress:
+          type: string
+          nullable: true
+        coverageDetailList:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoverageDetailsDto'
+        reinstatementDate:
+          type: string
+        processDate:
+          type: string
+      title: SummPoliciesInfoDto
+    AddressInfo:
+      title: AddressInfo
+      description: Address information for eligibility check
+      type: object
+      properties:
+        province:
+          type: string
+          example: NCR
+        city:
+          type: string
+          example: Manila
+        zip:
+          type: string
+          example: '1234'
+        country:
+          type: string
+          example: PH
+        planCode:
+          type: string
+          example: RA10B
+    NationalityInfo:
+      title: NationalityInfo
+      description: Nationality information for eligibility check
+      type: object
+      properties:
+        citizenship:
+          type: string
+          example: PH
+        planCode:
+          type: string
+          example: RA10B
+    OccupationInfo:
+      title: OccupationInfo
+      description: Occupation information for eligibility check
+      type: object
+      properties:
+        occupation:
+          type: string
+          example: Accountant
+        planCode:
+          type: string
+          example: RA10B
+    NatureOfBusinessInfo:
+      title: NatureOfBusiness
+      description: Nature of Business information for eligibility check
+      type: object
+      properties:
+        natureOfBusiness:
+          type: string
+          example: Banking
+    CreatePolicyDto:
+      type: object
+      properties:
+        planCode:
+          type: string
+          example: RA1P0B
+        companyCode:
+          type: string
+          example: SLGFI
+        transactionNo:
+          type: string
+          example: '2023000001'
+        referenceNo:
+          type: string
+          example: '123123123'
+        ingClientId:
+          type: string
+          example: '2080016153'
+        policy:
+          $ref: >-
+            https://api.swaggerhub.com/domains/Sun-Life-Financial/eSales_domain/0.0.1#/components/schemas/PolicyDetails
+        coverage:
+          $ref: >-
+            https://api.swaggerhub.com/domains/Sun-Life-Financial/eSales_domain/0.0.1#/components/schemas/PolicyCoverage
+        entryQuestions:
+          $ref: >-
+            https://api.swaggerhub.com/domains/Sun-Life-Financial/eSales_domain/0.0.1#/components/schemas/PolicyEntryQuestions
+        beneficiary:
+          $ref: >-
+            https://api.swaggerhub.com/domains/Sun-Life-Financial/eSales_domain/0.0.1#/components/schemas/PolicyBeneficiary
+        otherInsurance:
+          $ref: >-
+            https://api.swaggerhub.com/domains/Sun-Life-Financial/eSales_domain/0.0.1#/components/schemas/PolicyOtherInsurance
+        clientIdForm:
+          $ref: >-
+            https://api.swaggerhub.com/domains/Sun-Life-Financial/eSales_domain/0.0.1#/components/schemas/PolicyClientIdForm
+        sourceOfPayment:
+          $ref: >-
+            https://api.swaggerhub.com/domains/Sun-Life-Financial/eSales_domain/0.0.1#/components/schemas/PolicySourceOfPayment
+    IngeniumResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          endpoint:
+            type: string
+            example: CreatePolicy
+          sourceSystem:
+            type: string
+            example: ingenium
+          sourceSystemResponse:
+            type: object
+    AutoAppraisalDto:
+      title: AutoAppraisalDto
+      type: object
+      required:
+        - skipProcessing
+        - clientId
+        - policyId
+        - settleAccount
+        - companyCode
+      properties:
+        skipProcessing:
+          type: boolean
+          example: true
+        settleAccount:
+          type: boolean
+          example: true
+        companyCode:
+          type: string
+          example: SLGFI
+        clientId:
+          type: string
+          example: '2080015710'
+        policyId:
+          type: string
+          example: '258010197'
+    AutoAppraisalIngResp:
+      type: array
+      items:
+        type: object
+        properties:
+          endpoint:
+            type: string
+            example: UnderwriterDecisionUpdate
+          sourceSystem:
+            type: string
+            example: ingenium
+          sourceSystemResponse:
+            type: object
+            properties:
+              MirUserMsgTxtT:
+                type: string
+                example: 'ANALYSIS COMPLETE FOR POLICY: 2580102035'
+              MirUserMsgSevrtyG:
+                type: string
+                example: '1'
+  securitySchemes:
+    dev-api-scope:
+      type: oauth2
+      description: >-
+        This API uses OAuth 2 with the client credential grant flow. The
+        tokenUrl is for dev environment!
+      flows:
+        clientCredentials:
+          tokenUrl: >-
+            https://sunlifeasiaapi.oktapreview.com/oauth2/aus13ed8ugC9EVGoS1d7/v1/token
+          scopes:
+            apiplatform.asia.policyservice.policy.read: For retrieving policy details
+            apiplatform.asia.policyservice.beneficiary.uad: For creating /updating/deleting beneficiary
+            apiplatform.asia.policyservice.eligibility.uad: For checking of policy eligibility
+            apiplatform.asia.policyservice.policy.uad: For creation of policy in ingenium
+    sit-api-scope:
+      type: oauth2
+      description: >-
+        This API uses OAuth 2 with the client credential grant flow. The
+        tokenUrl is for sit environment!
+      flows:
+        clientCredentials:
+          tokenUrl: >-
+            https://sunlifeasiaapi.oktapreview.com/oauth2/aus13ed8ugC9EVGoS1d7/v1/token
+          scopes:
+            apiplatform.asia.policyservice.policy.read: For retrieving policy details
+            apiplatform.asia.policyservice.beneficiary.uad: For creating /updating/deleting beneficiary
+            apiplatform.asia.policyservice.eligibility.uad: For checking of policy eligibility
+            apiplatform.asia.policyservice.policy.uad: For creation of policy
+    uat-api-scope:
+      type: oauth2
+      description: >-
+        This API uses OAuth 2 with the client credential grant flow. The
+        tokenUrl is for uat environment!
+      flows:
+        clientCredentials:
+          tokenUrl: >-
+            https://sunlifeasiaapi.oktapreview.com/oauth2/aus13ed8ugC9EVGoS1d7/v1/token
+          scopes:
+            apiplatform.asia.policyservice.policy.read: For retrieving policy details
+            apiplatform.asia.policyservice.beneficiary.uad: For creating /updating/deleting beneficiary
+            apiplatform.asia.policyservice.eligibility.uad: For checking of policy eligibility
+            apiplatform.asia.policyservice.policy.uad: For creation of policy
+    prod-api-scope:
+      type: oauth2
+      description: >-
+        This API uses OAuth 2 with the client credential grant flow. The
+        tokenUrl is for uat environment!
+      flows:
+        clientCredentials:
+          tokenUrl: >-
+            https://sunlifeasiaapi.oktapreview.com/oauth2/aus13ed8ugC9EVGoS1d7/v1/token
+          scopes:
+            apiplatform.asia.policyservice.policy.read: For retrieving policy details
+            apiplatform.asia.policyservice.beneficiary.uad: For creating /updating/deleting beneficiary
+            apiplatform.asia.policyservice.eligibility.uad: For checking of policy eligibility
+            apiplatform.asia.policyservice.policy.uad: For creation of policy

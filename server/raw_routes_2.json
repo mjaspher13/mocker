@@ -1,0 +1,1046 @@
+openapi: 3.0.0
+
+info:
+  version: 1.0.0
+  x-api-id: "0419"
+  title: Client Portfolio Service
+  description: "An API that retrieves data from the ClientDB through the Client Portfolio Service endpoints."
+  x-rapidapi-team: "Asia-PH-Common-APIs"
+  x-business-domain: "Clients"
+  x-region: "SLF Asia"
+  x-api-type: "System"
+  x-journey-stage: "Client Maintenance"
+  x-country: "PH"
+  contact:
+    name: "ASCP Common API Team"
+    url: "https://sunlifefinancial.sharepoint.com/sites/Operations/ASCPDA/ASCProductManagement/SitePages/SLF-Client-Portfolio-Services.aspx"
+    email: "ASCP-Common-API-Services-Team@sunlife.com"
+    
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/MJASPHERRAMILE/client_portfolio_service/1.0.0
+  - url: https://sv84959.sunlifecorp.com:34443/dev-l4j-ph-client-portfolio
+    description: "Development server environment"
+  - url: https://sv85333.sunlifecorp.com:34443/sit-l4j-ph-client-portfolio
+    description: "SIT server environment"
+  - url: https://sv85185.sunlifecorp.com:34443/uat-l4j-ph-client-portfolio
+    description: "Stage server environment"
+  - url: https://sv85215.sunlifecorp.com:34443/l4j-ph-client-portfolio
+    description: "PROD1 server environment"
+  - url: https://sv85216.sunlifecorp.com:34443/l4j-ph-client-portfolio
+    description: "PROD2 server environment"
+  - url: https://de-servicing.sunlifecorp.com/l4j-ph-client-portfolio
+    description: "PRODF5 server environment"
+    
+externalDocs:
+  description: Client Portfolio Service Bitbucket repository link
+  url: "http://sv516072.ph.sunlife:7990/projects/COM/repos/slf-client-portfolio-svc-nodejs/browse?at=refs%2Fheads%2Frelease%2F1.0.0-k8s"
+  
+paths:
+  '/healthcheck':
+    get:
+      tags:
+      - "Healthcheck"
+      summary: "Checks connection to database and tables."
+      description: "This endpoint is used to do a connectivity check on the backend web service"
+      operationId: healthcheck
+      
+      parameters:
+      - $ref: '#/components/parameters/traceability-id'
+      - $ref: '#/components/parameters/correlation-id'
+      - $ref: '#/components/parameters/auth-token'
+      - $ref: '#/components/parameters/version'
+      
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckResponse'
+              example:
+                statusCode: 200
+                message:
+                  result:
+                    canConnectToDB: true
+                  customMsg: OK
+                  
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonResponse'
+              example:
+                data: null
+                notifications:
+                  - code: ERR04196005
+                    description: No Authorization header or the token is not bearer type
+                    message: MISSING_AUTH_TOKEN
+                    timestamp: 2022-02-09T02:46:47.873+0000
+                    
+        '403':
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common403Response'
+              example:
+                message: Invalid version
+                
+        '404':
+          description: 'Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonResponse'
+              example:
+                data: null
+                notifications:
+                  - code: ERR04196000
+                    description: Request path /health-check cannot be found in the spec.
+                    message: INVALID_REQUEST_PATH
+                    timestamp: 2022-02-10T02:32:46.501+0000
+                    
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Generic500Response'
+              example:
+                statusCode: 5200
+                message:
+                  result: {}
+                  customMsg: 'Application Error: Error: ORA-12541: TNS:no listener'
+                  
+      security:
+      - dev-api-scope:
+        - apiplatform.asia.clientportfolio.health.read
+        
+      - sit-api-scope:
+        - apiplatform.asia.clientportfolio.health.read
+        
+      - stage-api-scope:
+        - apiplatform.asia.clientportfolio.health.read
+        
+      - prod-api-scope:
+        - apiplatform.asia.clientportfolio.health.read
+        
+  '/pre-need':
+    get:
+      tags:
+      - "Preneed Portfolio"
+      summary: "Gets the pre-need client portfolio details"
+      description: "This endpoint is used to get the pre-need client portfolio details."
+      operationId: preNeed
+      
+      parameters:
+      - $ref: '#/components/parameters/traceability-id'
+      - $ref: '#/components/parameters/correlation-id'
+      - $ref: '#/components/parameters/auth-token'
+      - $ref: '#/components/parameters/version'
+      - $ref: '#/components/parameters/pkCifNo'
+      - $ref: '#/components/parameters/cifClientNo'
+      - $ref: '#/components/parameters/recordsPerPage'
+      - $ref: '#/components/parameters/pageNumber'
+
+      
+      responses:
+        '200':
+          description: "Successful request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreneedResponse'
+              example:
+                {
+                  "statusCode": 200,
+                  "message": {
+                      "result": {
+                          "totalPlanValue": "30,000.00",
+                          "totalPlanCount": 3,
+                          "pnPlanPortfolioList": [
+                              {
+                                  "referenceNumber": "E00000000381551",
+                                  "productCode": "EPZ43",
+                                  "productName": "Sun Education - Red Toga  (4yc)",
+                                  "statusCode": "PAID",
+                                  "statusDesc": "Fully Paid By The Payor",
+                                  "currency": "PHP",
+                                  "planValue": "15,000.00",
+                                  "maturityDate": "05/19/2021",
+                                  "issueDate": "05/19/2006",
+                                  "grossContractPrice": "38,400.00",
+                                  "terminationValue": "19,200.00",
+                                  "servicingAdvisor": "3000002638",
+                                  "personalizedName": "Test One",
+                              }
+                          ],
+                          "pageNumber": 1,
+                          "numberOfPages": 1,
+                          "recordsPerPage": 10
+                      },
+                      "customMsg": "OK"
+                }
+            }
+            
+        '400':
+          description: "Request validation error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common400Response'
+              example:
+                statusCode: 4000
+                message:
+                  result: {}
+                  customMsg: Invalid parameter/s
+                  
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonResponse'
+              example:
+                data: null
+                notifications:
+                  - code: ERR04196005
+                    description: No Authorization header or the token is not bearer type
+                    message: MISSING_AUTH_TOKEN
+                    timestamp: 2022-02-09T02:46:47.873+0000
+                    
+        '403':
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common403Response'
+              example:
+                message: Invalid version
+                
+        '404':
+          description: 'Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonResponse'
+              example:
+                data: null
+                notifications:
+                  - code: ERR04196000
+                    description: Request path /preneed cannot be found in the spec.
+                    message: INVALID_REQUEST_PATH
+                    timestamp: 2022-02-10T02:32:46.501+0000
+                    
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Generic500Response'
+              example:
+                statusCode: 5200
+                message:
+                  result: {}
+                  customMsg: 'Application Error: Error: ORA-12541: TNS:no listener'
+      security:
+      - dev-api-scope:
+        - apiplatform.asia.clientportfolio.preneed.read
+        
+      - sit-api-scope:
+        - apiplatform.asia.clientportfolio.preneed.read
+        
+      - stage-api-scope:
+        - apiplatform.asia.clientportfolio.preneed.read
+        
+      - prod-api-scope:
+        - apiplatform.asia.clientportfolio.preneed.read
+        
+  '/mutual-fund':
+    get:
+      tags:
+      - "Mutual Fund Portfolio"
+      summary: "Gets the client portfolio details for mutual fund policies"
+      description: "This endpoint is used to get the client portfolio details for mutual fund policies."
+      operationId: mutualFund
+      parameters:
+      - $ref: '#/components/parameters/traceability-id'
+      - $ref: '#/components/parameters/correlation-id'
+      - $ref: '#/components/parameters/auth-token'
+      - $ref: '#/components/parameters/version'
+      - $ref: '#/components/parameters/pkCifNo'
+      - $ref: '#/components/parameters/cifClientNo'
+      - $ref: '#/components/parameters/recordsPerPage'
+      - $ref: '#/components/parameters/pageNumber'
+      
+      responses:
+        '200':
+          description: "Successful request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreneedResponse'
+              example:
+               {
+                  "statusCode": 200,
+                  "message": {
+                    "result": {
+                      "totalAccounts": 0,
+                      "totalMutualFundCount": 1,
+                      "mutualFundPortfolioList": [
+                        {
+                          "referenceNumber": "00103616CF01",
+                          "accountName": "Mrtest",
+                          "accountTypeCode": "IND",
+                          "accountType": "Individual",
+                          "totalPhpFundValue": 70312.5,
+                          "totalUsdFundValue": 0,
+                          "totalPhpCostOfInvestment": 75000,
+                          "totalUsdCostOfInvestment": 0,
+                          "totalPhpUnrealizedGainLoss": -4687.5,
+                          "totalUsdUnrealizedGainLoss": 0,
+                          "servicingAdvisor": "100245",
+                          "totalPhpCostOfRedemption": "0.00",
+                          "totalUsdCostOfRedemption": "0.00",
+                          "jai": "-",
+                          "fundList": [
+                            {
+                              "fundCode": "CF0002",
+                              "fundName": "Balanced Fund",
+                              "navType": "Shares",
+                              "currency": "Php",
+                              "nav": 1.5,
+                              "asOfDate": "2025-06-06T16:00:00.000Z",
+                              "totalShares": 46875,
+                              "fundValue": 70312.5,
+                              "costOfInvestment": 75000,
+                              "roi": -6.25,
+                              "costOfRedemption": "0.00",
+                              "personalizedName": "Test One"
+                            }
+                          ]
+                        }
+                      ],
+                      "pageNumber": 1,
+                      "numberOfPages": 1,
+                      "recordsPerPage": 10
+                    },
+                    "customMsg": "OK"
+                  }
+              }
+        '400':
+          description: "Request validation error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common400Response'
+              example:
+                statusCode: 4000
+                message:
+                  result: {}
+                  customMsg: Invalid parameter/s
+                  
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonResponse'
+              example:
+                data: null
+                notifications:
+                  - code: ERR04196005
+                    description: No Authorization header or the token is not bearer type
+                    message: MISSING_AUTH_TOKEN
+                    timestamp: 2022-02-09T02:46:47.873+0000
+                    
+        '403':
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common403Response'
+              example:
+                message: Invalid version
+                
+        '404':
+          description: 'Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonResponse'
+              example:
+                data: null
+                notifications:
+                  - code: ERR04196000
+                    description: Request path /mutualfund cannot be found in the spec.
+                    message: INVALID_REQUEST_PATH
+                    timestamp: 2022-02-10T02:32:46.501+0000
+                    
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Generic500Response'
+              example:
+                statusCode: 5200
+                message:
+                  result: {}
+                  customMsg: 'Application Error: Error: ORA-12541: TNS:no listener'
+      security:
+      - dev-api-scope:
+        - apiplatform.asia.clientportfolio.mutualfund.read
+        
+      - sit-api-scope:
+        - apiplatform.asia.clientportfolio.mutualfund.read
+        
+      - stage-api-scope:
+        - apiplatform.asia.clientportfolio.mutualfund.read
+        
+      - prod-api-scope:
+        - apiplatform.asia.clientportfolio.mutualfund.read
+        
+  '/life':
+    get:
+      tags:
+      - "Life Fund Portfolio"
+      summary: "Gets the client portfolio details for life policies"
+      description: "This endpoint is used to get the client portfolio details for life policies."
+      operationId: life
+      parameters:
+      - $ref: '#/components/parameters/traceability-id'
+      - $ref: '#/components/parameters/correlation-id'
+      - $ref: '#/components/parameters/auth-token'
+      - $ref: '#/components/parameters/version'
+      - $ref: '#/components/parameters/pkCifNo'
+      - $ref: '#/components/parameters/cifClientNo'
+      - $ref: '#/components/parameters/recordsPerPage'
+      - $ref: '#/components/parameters/pageNumber'
+      - $ref: '#/components/parameters/companyCode'
+      
+      responses:
+        '200':
+          description: "Successful response data"
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/LifeFundResponse'
+              example:
+                {
+                  "statusCode": 200,
+                  "message": {
+                      "result": {
+                          "totalPolicyCount": 1,
+                          "usdPolicyCount": 0,
+                          "phpPolicyCount": 1,
+                          "totalUsdAmount": "0.00",
+                          "totalPhpAmount": "0.00",
+                          "lifePortfolioList": [
+                              {
+                                  "referenceNumber": "0815613865",
+                                  "productCode": "ML1P1C",
+                                  "productName": "Sun Maxilink One",
+                                  "statusCode": "PERU",
+                                  "statusDesc": "PENDING, ERRORS, REQ'T O/S, U/W REQ'D",
+                                  "insuranceCode": "C",
+                                  "insuranceType": "Universal Life - Risk",
+                                  "policyType": "E",
+                                  "issueDate": "01/01/2017",
+                                  "currency": "Php",
+                                  "faceAmount": 0,
+                                  "riderCount": 0,
+                                  "lapseStartDate": "-",
+                                  "lastDepositAmount": "-",
+                                  "lastDepositDate": "-",
+                                  "premiumAmount": 0,
+                                  "premiumDueDate": "-",
+                                  "dividendValue": 0,
+                                  "dividendAsofDate": "-",
+                                  "billModeCode": "12",
+                                  "billMode": "Single Premium",
+                                  "billTypeCode": "P",
+                                  "billType": "Single Premium",
+                                  "insuredId": "3080095310",
+                                  "insuredFirstName": "",
+                                  "insuredMiddleName": "",
+                                  "insuredLastName": "",
+                                  "insuredSuffix": "",
+                                  "insuredName": "Ownfn Stp2018qkg Ownmn Stp2018qkg Ownln Stp2018qkg",
+                                  "relationship": "Insured",
+                                  "servicingAdvisor": "052011",
+                                  "personalizedName": "Test One",
+                                  "freezeOrder": "-"
+                              }
+                          ],
+                          "pageNumber": 1,
+                          "numberOfPages": 1,
+                          "recordsPerPage": 10
+                      },
+                      "customMsg": "OK"
+                  }
+              }
+              
+        '400':
+          description: "Request validation error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common400Response'
+              example:
+                statusCode: 4000
+                message:
+                  result: {}
+                  customMsg: Invalid parameter/s
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonResponse'
+              example:
+                data: null
+                notifications:
+                  - code: ERR04196005
+                    description: No Authorization header or the token is not bearer type
+                    message: MISSING_AUTH_TOKEN
+                    timestamp: 2022-02-10T02:35:18.701+0000
+                    
+        '403':
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common403Response'
+              example:
+                message: Invalid version
+        '404':
+          description: 'Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonResponse'
+              example:
+                data: null
+                notifications:
+                  - code: ERR04196000
+                    description: Request path /lyf cannot be found in the spec.
+                    message: INVALID_REQUEST_PATH
+                    timestamp: 2022-02-10T02:32:46.501+0000
+                    
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+      security:
+      - dev-api-scope:
+        - apiplatform.asia.clientportfolio.life.read
+        
+      - sit-api-scope:
+        - apiplatform.asia.clientportfolio.life.read
+        
+      - stage-api-scope:
+        - apiplatform.asia.clientportfolio.life.read
+        
+      - prod-api-scope:
+        - apiplatform.asia.clientportfolio.life.read
+  '/priority-notifications':
+    get:
+      tags:
+      - "Life Fund Portfolio"
+      summary: "Retrieved priority reminder tagging"
+      description: "The endpoint will be responsible for retrieving priority reminder tagging to be shown in the client's CPMA account."
+      operationId: priorityNotifications
+      parameters:
+      - $ref: '#/components/parameters/traceability-id'
+      - $ref: '#/components/parameters/correlation-id'
+      - $ref: '#/components/parameters/auth-token'
+      - $ref: '#/components/parameters/version'
+      - $ref: '#/components/parameters/cifClientNo'
+      - $ref: '#/components/parameters/companyCode'
+      responses:
+        '200':
+          description: "Successful response data"
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/PriorityNotificationsResponse'
+              example:
+                {
+                  "statusCode": 200,
+                  "message": {
+                      "result": 
+                      {
+
+                        "hasBadAddress": false,
+                        "policyReminders": [
+                            {
+                                "referenceNumber": "031219180",
+                                "hasMissingDob": false,
+                                "paymentReminder": "Due Soon"
+                            },
+                            {
+                                "referenceNumber": "031279023",
+                                "hasMissingDob": false,
+                                "paymentReminder": "Due Soon"
+                            },
+                            {
+                                "referenceNumber": "0501392661",
+                                "hasMissingDob": false,
+                                "paymentReminder": "Due Soon"
+                            },
+                            {
+                                "referenceNumber": "0805126295",
+                                "hasMissingDob": false,
+                                "paymentReminder": "Due Soon"
+                            }
+                        ]
+                      },
+                      "customMsg": "OK"
+                  }
+              }
+        '400':
+          description: "Request validation error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common400Response'
+              example:
+                statusCode: 4000
+                message:
+                  result: {}
+                  customMsg: Invalid parameter/s
+        '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonResponse'
+              example:
+                data: null
+                notifications:
+                  - code: ERR04196005
+                    description: No Authorization header or the token is not bearer type
+                    message: MISSING_AUTH_TOKEN
+                    timestamp: 2022-02-10T02:35:18.701+0000
+                    
+        '403':
+          description: "Forbidden"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common403Response'
+              example:
+                message: Invalid version
+        '404':
+          description: 'Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonResponse'
+              example:
+                data: null
+                notifications:
+                  - code: ERR04196000
+                    description: Request path /lyf cannot be found in the spec.
+                    message: INVALID_REQUEST_PATH
+                    timestamp: 2022-02-10T02:32:46.501+0000
+                    
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+      security:
+      - dev-api-scope:
+        - apiplatform.asia.clientportfolio.priority.notifications.read
+        
+      - sit-api-scope:
+        - apiplatform.asia.clientportfolio.priority.notifications.read
+        
+      - stage-api-scope:
+        - apiplatform.asia.clientportfolio.priority.notifications.read
+        
+      - prod-api-scope:
+        - apiplatform.asia.clientportfolio.priority.notifications.read        
+components:
+  parameters:
+    traceability-id:
+      name: x-traceability-id
+      description: "Common header parameters for centeralized logging" 
+      in: header
+      required: true
+      schema: 
+        $ref: 'https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/x-traceability-id'
+    correlation-id:
+      name: x-correlation-id
+      description: "Identifies the unique correlation ID sent by each consumer to the APIGateway."
+      in: header
+      required: true
+      schema:
+       $ref: 'https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/x-correlation-id'        
+    auth-token:
+      name: authorization
+      description: "Header parameter to prevent thread function attack and access token validation" 
+      in: header
+      required: true
+      schema: 
+        $ref: 'https://api.swaggerhub.com/domains/Sun-Life-Financial/EnterpriseCommonComponents/1.4.4#/components/schemas/x-auth-token'
+    version:
+      name: version
+      description: "Version of the API's service implementation. Defaults to \"0\" if not passed."
+      in: query
+      required: false
+      schema:
+        type: string
+        example: 1
+    pkCifNo:
+      name: pkCifNo
+      in: query
+      description: "Corresponds to the pkCifNo of the CLI_PRTFO_PN_T table."
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+    cifClientNo:
+      name: cifClientNo
+      in: query
+      description: "Corresponds to the cifClientNo of the CLI_PRTFO_PN_T table."
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+    recordsPerPage:
+      name: recordsPerPage
+      in: query
+      description: "Number of records that will be returned per page. Defaults to 10 if not passed"
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: number
+    pageNumber:
+      name: pageNumber
+      in: query
+      description: "Page number to be returned. Defaults to \"1\" if not passed"
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: number
+    companyCode:
+      name: companyCode
+      description: Company code to determine which Ingenium Webservice will be called. e.g. SLOCPI, SLGFI. Default is SLOCPI
+      in: query
+      required: false
+      schema:
+        type: string
+        example: SLOCPI
+  schemas:
+    #------------------
+    # Response schemas
+    #------------------
+    HealthCheckResponse:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: object
+          properties: 
+            result:
+              type: object
+              properties:
+                canConnectToDB:
+                  type: boolean
+                customMsg: 
+                  type: string
+    GenericResponse:
+      type: object
+      properties:
+          status:
+             type: number
+          error:
+             type: string
+    Generic500Response:
+      type: object
+      properties:
+          statusCode:
+            type: number
+          message: 
+            type: object
+            properties:
+              result: 
+                type: object
+              customMsg:
+                type: string
+    CommonResponse:
+      type: object
+      properties:
+        data:
+          type: object
+        notifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/GenericNotificationsArray'
+    Common400Response:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message: 
+          type: object
+          properties:
+            result: 
+              type: object
+            customeMsg:
+              type: string
+    Common403Response:
+      type: object
+      properties:
+        message:
+          type: string
+    PreneedResponse:
+      type: object
+      properties:
+          statusCode: 
+            type: number
+          message:
+            type: object
+            properties:
+                result:
+                  type: object
+                  properties:
+                      totalPlanValue:
+                        type: string
+                      totalPlanCount:
+                        type: number
+                      pnPlanPortfolioList:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/PlanPortfolioList'
+    LifeFundResponse:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message: 
+          type: object
+          properties:
+            result:
+              type: object
+              properties:
+                totalPolicyCount:
+                  type: number
+                usdPolicyCount:
+                  type: number
+                phpPolicyCount:
+                  type: number
+                totalUsdAmount:
+                  type: string
+                totalPhpAmount:
+                  type: string
+                lifePortfolioList:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/LifePortfolioListArray'
+                pageNumber:
+                  type: string
+                numberOfPages:
+                  type: string
+                recordsPerPage:
+                  type: string
+            customMsg:
+              type: string
+    #-------------------------
+    # Response schemas arrays
+    #-------------------------
+    GenericNotificationsArray:
+      type: object
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+    PlanPortfolioList:
+      type: object
+      properties:
+        referenceNumber:
+          type: string
+        productCode: 
+          type: string
+        productName:
+          type: string
+        statusCode:
+          type: string
+        statusDesc:
+          type: string
+        currency:
+          type: string
+        planValue:
+          type: string
+        maturityDate:
+          type: string
+        issueDate:
+          type: string
+        grossContractPrice:
+          type: string
+        terminationValue:
+          type: string
+        servicingAdvisor:
+          type: string
+        personalizedName:
+          type: string
+    LifePortfolioListArray:
+      type: object
+      properties:
+        referenceNumber:
+          type: string
+        productCode: 
+          type: string
+        productName: 
+          type: string
+        statusCode:
+          type: string
+        statusDesc:
+          type: string
+        insuranceCode:
+          type: string
+        insuranceType:
+          type: string
+        policyType:
+          type: string
+        issueDate:
+          type: string
+        currency:
+          type: string
+        faceAmount:
+          type: number
+        riderCount:
+          type: number
+        lapseStartDate:
+          type: string
+        lastDepositAmount:
+          type: string
+        lastDepositDate:
+          type: string
+        premiumAmount:
+          type: number
+        premiumDueDate:
+          type: string
+        dividendValue:
+          type: number
+        dividendAsofDate:
+          type: string
+        billModeCode:
+          type: string
+        billMode:
+          type: string
+        billTypeCode:
+          type: string
+        billType:
+          type: string
+        insuredName:
+          type: string
+        relationship:
+          type: string
+        servicingAdvisor:
+          type: string
+        personalizedName:
+          type: string
+        freezeOrder:
+          type: string
+    PriorityNotificationsResponse:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message: 
+          type: object
+          properties:
+            result:
+              type: object
+              properties:
+                hasBadAddress:
+                  type: boolean
+                policyReminders:  
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PolicyRemindersArray'
+            customMsg:
+              type: string        
+    PolicyRemindersArray:
+      type: object
+      properties:
+        referenceNo:
+          type: string
+        hasMissingDob:
+          type: boolean
+        paymentReminder:
+          type: string
+  #----------------------------
+  # Securities:
+  #----------------------------
+  securitySchemes:
+    "dev-api-scope":
+      type: oauth2
+      description: "This API uses OAuth 2 with the client credential grant flow. The tokenUrl is for dev environment!"
+      flows:
+        clientCredentials:
+          tokenUrl: "https://sunlifeasiaapi.oktapreview.com/oauth2/aus13ed8ugC9EVGoS1d7/v1/token"
+          scopes:
+            apiplatform.asia.clientportfolio.health.read: "This is the read-access scope for Client Porfolio GET healthcheck endpoint."
+            apiplatform.asia.clientportfolio.preneed.read: "This is the read-access scope for Client Portfolio GET pre-need endpoint."
+            apiplatform.asia.clientportfolio.mutualfund.read: "This is the read-access scope for Client Portfolio GET mutual-fund endpoint."
+            apiplatform.asia.clientportfolio.life.read: "This is the read-access scope for Client Portfolio GET life endpoint."
+            apiplatform.asia.clientportfolio.priority.notifications.read: "This is the read-access scope for Client Portfolio GET priority notification endpoint."
+            
+    "sit-api-scope":
+      type: oauth2
+      description: "This API uses OAuth 2 with the client credential grant flow. The tokenUrl is for dev environment!"
+      flows:
+        clientCredentials:
+          tokenUrl: "https://sunlifeasiaapi.oktapreview.com/oauth2/aus1753khl1IiUOJI1d7/v1/token"
+          scopes:
+            apiplatform.asia.clientportfolio.health.read: "This is the read-access scope for Client Porfolio GET healthcheck endpoint."
+            apiplatform.asia.clientportfolio.preneed.read: "This is the read-access scope for Client Portfolio GET pre-need endpoint."
+            apiplatform.asia.clientportfolio.mutualfund.read: "This is the read-access scope for Client Portfolio GET mutual-fund endpoint."
+            apiplatform.asia.clientportfolio.life.read: "This is the read-access scope for Client Portfolio GET life endpoint."
+            apiplatform.asia.clientportfolio.priority.notifications.read: "This is the read-access scope for Client Portfolio GET priority notification endpoint."
+    "stage-api-scope":
+      type: oauth2
+      description: "This API uses OAuth 2 with the client credential grant flow. The tokenUrl is for dev environment!"
+      flows:
+        clientCredentials:
+          tokenUrl: "https://sunlifeasiaapi.oktapreview.com/oauth2/aus1754tq9zRDWe6y1d7/v1/token"
+          scopes:
+            apiplatform.asia.clientportfolio.health.read: "This is the read-access scope for Client Porfolio GET healthcheck endpoint."
+            apiplatform.asia.clientportfolio.preneed.read: "This is the read-access scope for Client Portfolio GET pre-need endpoint."
+            apiplatform.asia.clientportfolio.mutualfund.read: "This is the read-access scope for Client Portfolio GET mutual-fund endpoint."
+            apiplatform.asia.clientportfolio.life.read: "This is the read-access scope for Client Portfolio GET life endpoint."
+            apiplatform.asia.clientportfolio.priority.notifications.read: "This is the read-access scope for Client Portfolio GET priority notification endpoint."
+            
+    "prod-api-scope":
+      type: oauth2
+      description: "This API uses OAuth 2 with the client credential grant flow. The tokenUrl is for dev environment!"
+      flows:
+        clientCredentials:
+          tokenUrl: "https://sunlifeasiaapi.oktapreview.com/oauth2/ausdq94oe5HNE7TI2696/v1/token"
+          scopes:
+            apiplatform.asia.clientportfolio.health.read: "This is the read-access scope for Client Porfolio GET healthcheck endpoint."
+            apiplatform.asia.clientportfolio.preneed.read: "This is the read-access scope for Client Portfolio GET pre-need endpoint."
+            apiplatform.asia.clientportfolio.mutualfund.read: "This is the read-access scope for Client Portfolio GET mutual-fund endpoint."
+            apiplatform.asia.clientportfolio.life.read: "This is the read-access scope for Client Portfolio GET life endpoint."
+            apiplatform.asia.clientportfolio.priority.notifications.read: "This is the read-access scope for Client Portfolio GET priority notification endpoint."
