@@ -16,6 +16,501 @@
         "_type": "workspace"
       },
       {
+        "_id": "mock_1",
+        "type": "MockRoute",
+        "parentId": "wrk_client_service",
+        "modified": 1718342682991,
+        "created": 1718342682991,
+        "url": "/address",
+        "method": "POST",
+        "name": "Add or Update address of the client",
+        "description": "Create or update an address. Required header parameters are x-traceability-id and authorization token. OAuth 2.0 security is used for this API with bearer access token. To add a new address, call this method and set the client id and address fields.",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "statusCode": 201,
+        "body": "{\"data\": null, \"notifications\": [{\"code\": \"SUC00000000\", \"message\": \"SUCCESS\", \"description\": \"The request has been submitted successfully\", \"timestamp\": \"2020-09-25T17:55:04.288+0000\", \"metadata\": null}]}",
+        "_type": "mock_route"
+      },
+      {
+        "_id": "mock_2",
+        "type": "MockRoute",
+        "parentId": "wrk_client_service",
+        "modified": 1718342682992,
+        "created": 1718342682992,
+        "url": "/profile/{icifClientNo}",
+        "method": "GET",
+        "name": "Find client Profile by Client No",
+        "description": "Retrieve list of Client Addresses by Client ID.",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "statusCode": 200,
+        "body": "{\"data\": {\"icifClientNo\": \"123456\", \"firstName\": \"Juan\", \"lastName\": \"Dela Cruz\", \"middleName\": \"Tamad\", \"birthDate\": \"01/01/1990\", \"isAccountCorporate\": false, \"hasTin\": true, \"contactInfo\": {\"username\": \"juan@info.com\", \"mobileNo\": \"09173122899\"}, \"clientAccounts\": {\"life\": 2, \"mutualFund\": 2, \"preNeed\": 1}, \"addressList\": [{\"addressType\": \"PR\", \"addressLine1\": \"18th Street\", \"city\": \"Bocaue\", \"province\": \"Bulacan\", \"country\": \"Philippines\", \"zipCode\": \"3018\", \"isDefault\": true}]}, \"notification\": null}",
+        "_type": "mock_route"
+      },
+      {
+        "_id": "mock_3",
+        "type": "MockRoute",
+        "parentId": "wrk_client_service",
+        "modified": 1718342682993,
+        "created": 1718342682993,
+        "url": "/profiles",
+        "method": "GET",
+        "name": "Find client Profiles by criteria",
+        "description": "Retrieve all client profiles and client accounts based on submitted parameters.",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "statusCode": 200,
+        "body": "{\"data\": {\"clientProfileList\": [{\"clientId\": \"123456\", \"firstName\": \"Juan\", \"lastName\": \"Dela Cruz\", \"middleName\": \"Tamad\", \"birthDate\": \"01/01/1990\", \"isAccountCorporate\": false, \"hasTin\": true, \"fraudTag\": true, \"addressList\": [{\"addressType\": \"PR\", \"addressLine1\": \"18th Street\", \"city\": \"Bocaue\", \"province\": \"Bulacan\", \"country\": \"Philippines\", \"zipCode\": \"3018\", \"isDefault\": true}]}]}, \"notifications\": null}",
+        "_type": "mock_route"
+      },
+      {
+        "_id": "mock_4",
+        "type": "MockRoute",
+        "parentId": "wrk_client_service",
+        "modified": 1718342682994,
+        "created": 1718342682994,
+        "url": "/profile/{icifClientNo}/identification-map",
+        "method": "POST",
+        "name": "Add/Update client contact information",
+        "description": "Insert/Update client contact information in Client DB - CLIENT_IDENTIFICATION_MAP table.",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "statusCode": 201,
+        "body": "{\"data\": null, \"notifications\": [{\"code\": \"SUC00000000\", \"message\": \"SUCCESS\", \"description\": \"The request has been submitted successfully\", \"timestamp\": \"2020-09-25T17:55:04.288+0000\", \"metadata\": null}]}",
+        "_type": "mock_route"
+      },
+      {
+        "_id": "mock_5",
+        "type": "MockRoute",
+        "parentId": "wrk_client_service",
+        "modified": 1718342682995,
+        "created": 1718342682995,
+        "url": "/clients",
+        "method": "POST",
+        "name": "Create new Client using Ingenium Calls",
+        "description": "Calls Ingenium endpoints in order to create a new client.",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "statusCode": 201,
+        "body": "{\"data\": [{\"endpoint\": \"ClientCreate\", \"sourceSystem\": \"ingenium\", \"sourceSystemResponse\": {\"ClientData\": {\"MirCliInfo\": {\"MirCliId\": \"2080015959\", \"MirCliLangCd\": \"E\"}, \"MirUserMsgG\": {\"MirUserMsgTxtG\": {\"MirUserMsgTxtT\": \"MAINTENANCE COMPLETED - CONTINUE\"}, \"MirUserMsgSevrtyG\": {\"MirUserMsgSevrtyT\": \"1\"}}}}}], \"notifications\": [{\"code\": 201, \"message\": \"Success\", \"description\": \"The request was successfully submitted\", \"timestamp\": \"2020-09-25T17:55:04.288+0000\"}]}",
+        "_type": "mock_route"
+      },
+      {
+        "_id": "mock_6",
+        "type": "MockRoute",
+        "parentId": "wrk_client_service",
+        "modified": 1718342682996,
+        "created": 1718342682996,
+        "url": "/health-check",
+        "method": "GET",
+        "name": "Health Check",
+        "description": "Health check API for Client Service",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "statusCode": 200,
+        "body": "{\"data\": {\"oracleDbHealthCheck\": {\"appDbPersistenceUnit\": {\"databaseUp\": {\"success\": {\"SERVICE_NOTIFY_EMAIL_TEMPLATE\": [\"SELECT\", \"DELETE\", \"INSERT\", \"UPDATE\"], \"SERVICE_NOTIFY\": [\"DELETE\", \"INSERT\", \"UPDATE\", \"SELECT\"]}, \"failure\": [\"APPLICATION\"]}, \"clientPortalPersistenceUnit\": {\"databaseUp\": {\"success\": {\"PORTAL_USER_ADDRESS\": [\"SELECT\"]}, \"failure\": [\"APPLICATION\"]}, \"icifPersistenceUnit\": {\"databaseUp\": {\"success\": {\"CIF_CUSTOMER_LOB\": [\"SELECT\", \"UPDATE\", \"INSERT\"], \"CLIENT_PROFILE\": [\"SELECT\", \"UPDATE\", \"INSERT\"]}, \"failure\": [\"APPLICATION\"]}, \"clientPersistenceUnit\": {\"databaseUp\": {\"success\": {\"CLIENT_PROFILE\": [\"SELECT\", \"INSERT\"]}, \"failure\": [\"APPLICATION\"]}}}, \"prismServiceHealthCheck\": true, \"sqlServerDbHealthCheck\": {\"addressMappingAppPersistenceUnit\": {\"databaseUp\": {\"success\": [\"CONNECT\"], \"failure\": []}}, \"slocpiIngeniumHealthCheck\": true, \"slgfiIngeniumHealthCheck\": true, \"c360HealthCheck\": true}, \"notifications\": null}}",
+        "_type": "mock_route"
+      },
+      {
+        "_id": "mock_7",
+        "type": "MockRoute",
+        "parentId": "wrk_client_service",
+        "modified": 1718342682997,
+        "created": 1718342682997,
+        "url": "/identity-validation",
+        "method": "GET",
+        "name": "Get identity validation information",
+        "description": "Retrieve information regarding identity validation process that was done by the client upon CPMA registration.",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "statusCode": 200,
+        "body": "{\"data\": {\"identityTicketNo\": \"123123\", \"clientNumber\": \"140847\", \"issuingCountry\": \"PH\", \"issuingDate\": \"2024-02-12T11:19:30.591\", \"gender\": \"M\", \"nationality\": \"Filipino\", \"firstName\": \"Juan\", \"lastName\": \"Sample\", \"birthPlace\": \"Manila\", \"birthDate\": \"01/01/2022\", \"expiryDate\": \"01/01/2023\", \"categorization\": \"Test\", \"validationStatus\": \"in progress\", \"srTicketNo\": \"05045728\", \"documentList\": [{\"documentId\": \"17\", \"documentName\": \"test\", \"side\": \"test\", \"uploadDate\": \"2024-02-12T11:19:30.591\"}, {\"documentId\": \"18\", \"documentName\": \"test 2\", \"side\": \"test 2\", \"uploadDate\": \"2024-02-12T11:19:30.591\"}]}, \"notification\": null}}",
+        "_type": "mock_route"
+      },   {
+        "_id": "wrk_client_service",
+        "type": "Workspace",
+        "parentId": null,
+        "modified": 1718342615927,
+        "created": 1718342615927,
+        "name": "Client Service API",
+        "description": "The purpose of this API is to manage Client Address. API to retrieve, update and save address in interfacing application.",
+        "scope": "collection",
+        "_type": "workspace"
+      },
+      {
+        "_id": "mock-route_health_check",
+        "type": "MockRoute",
+        "parentId": "wrk_client_service",
+        "modified": 1718342682983,
+        "created": 1717666987935,
+        "body": {
+          "statusCode": 200,
+          "message": {
+            "result": {
+              "canConnectToDB": true
+            },
+            "customMsg": "OK"
+          }
+        },
+        "headers": [
+          {
+            "description": "",
+            "id": "pair_a403c054227041dab03700da8da8f224",
+            "name": "Access-Control-Allow-Origin",
+            "value": "http://127.0.0.1:4200"
+          },
+          {
+            "description": "",
+            "id": "pair_a0e4c36b856b4c64a8f56f9e97802da6",
+            "name": "Access-Control-Allow-Headers",
+            "value": "content-type, X-Traceability-Id"
+          },
+          {
+            "description": "",
+            "id": "pair_1338a8a6a6304bb0a09d1d763ffd711b",
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "statusCode": 200,
+        "statusText": "",
+        "name": "/healthcheck",
+        "mimeType": "application/json",
+        "method": "GET",
+        "_type": "mock_route"
+      },
+      {
+        "_id": "mock-route_preneed",
+        "type": "MockRoute",
+        "parentId": "wrk_client_service",
+        "modified": 1718342682983,
+        "created": 1717666987935,
+        "body": {
+          "statusCode": 200,
+          "message": {
+            "result": {
+              "totalPlanValue": "30,000.00",
+              "totalPlanCount": 3,
+              "pnPlanPortfolioList": [
+                {
+                  "referenceNumber": "E00000000381551",
+                  "productCode": "EPZ43",
+                  "productName": "Sun Education - Red Toga (4yc)",
+                  "statusCode": "PAID",
+                  "statusDesc": "Fully Paid By The Payor",
+                  "currency": "PHP",
+                  "planValue": "15,000.00",
+                  "maturityDate": "05/19/2021",
+                  "issueDate": "05/19/2006",
+                  "grossContractPrice": "38,400.00",
+                  "terminationValue": "19,200.00",
+                  "servicingAdvisor": "3000002638",
+                  "personalizedName": "Test One"
+                }
+              ],
+              "pageNumber": 1,
+              "numberOfPages": 1,
+              "recordsPerPage": 10
+            },
+            "customMsg": "OK"
+          }
+        },
+        "headers": [
+          {
+            "description": "",
+            "id": "pair_a403c054227041dab03700da8da8f224",
+            "name": "Access-Control-Allow-Origin",
+            "value": "http://127.0.0.1:4200"
+          },
+          {
+            "description": "",
+            "id": "pair_a0e4c36b856b4c64a8f56f9e97802da6",
+            "name": "Access-Control-Allow-Headers",
+            "value": "content-type, X-Traceability-Id"
+          },
+          {
+            "description": "",
+            "id": "pair_1338a8a6a6304bb0a09d1d763ffd711b",
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "statusCode": 200,
+        "statusText": "",
+        "name": "/pre-need",
+        "mimeType": "application/json",
+        "method": "GET",
+        "_type": "mock_route"
+      },
+      {
+        "_id": "mock-route_mutual_fund",
+        "type": "MockRoute",
+        "parentId": "wrk_client_service",
+        "modified": 1718342682983,
+        "created": 1717666987935,
+        "body": {
+          "statusCode": 200,
+          "message": {
+            "result": {
+              "totalAccounts": 0,
+              "totalMutualFundCount": 1,
+              "mutualFundPortfolioList": [
+                {
+                  "referenceNumber": "00103616CF01",
+                  "accountName": "Mrtest",
+                  "accountTypeCode": "IND",
+                  "accountType": "Individual",
+                  "totalPhpFundValue": 70312.5,
+                  "totalUsdFundValue": 0,
+                  "totalPhpCostOfInvestment": 75000,
+                  "totalUsdCostOfInvestment": 0,
+                  "totalPhpUnrealizedGainLoss": -4687.5,
+                  "totalUsdUnrealizedGainLoss": 0,
+                  "servicingAdvisor": "100245",
+                  "totalPhpCostOfRedemption": "0.00",
+                  "totalUsdCostOfRedemption": "0.00",
+                  "jai": "-",
+                  "fundList": [
+                    {
+                      "fundCode": "CF0002",
+                      "fundName": "Balanced Fund",
+                      "navType": "Shares",
+                      "currency": "Php",
+                      "nav": 1.5,
+                      "asOfDate": "2025-06-06T16:00:00.000Z",
+                      "totalShares": 46875,
+                      "fundValue": 70312.5,
+                      "costOfInvestment": 75000,
+                      "roi": -6.25,
+                      "costOfRedemption": "0.00",
+                      "personalizedName": "Test One"
+                    }
+                  ]
+                }
+              ],
+              "pageNumber": 1,
+              "numberOfPages": 1,
+              "recordsPerPage": 10
+            },
+            "customMsg": "OK"
+          }
+        },
+        "headers": [
+          {
+            "description": "",
+            "id": "pair_a403c054227041dab03700da8da8f224",
+            "name": "Access-Control-Allow-Origin",
+            "value": "http://127.0.0.1:4200"
+          },
+          {
+            "description": "",
+            "id": "pair_a0e4c36b856b4c64a8f56f9e97802da6",
+            "name": "Access-Control-Allow-Headers",
+            "value": "content-type, X-Traceability-Id"
+          },
+          {
+            "description": "",
+            "id": "pair_1338a8a6a6304bb0a09d1d763ffd711b",
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "statusCode": 200,
+        "statusText": "",
+        "name": "/mutual-fund",
+        "mimeType": "application/json",
+        "method": "GET",
+        "_type": "mock_route"
+      },
+      {
+        "_id": "mock-route_life_fund",
+        "type": "MockRoute",
+        "parentId": "wrk_client_service",
+        "modified": 1718342682983,
+        "created": 1717666987935,
+        "body": {
+          "statusCode": 200,
+          "message": {
+            "result": {
+              "totalPolicyCount": 1,
+              "usdPolicyCount": 0,
+              "phpPolicyCount": 1,
+              "totalUsdAmount": "0.00",
+              "totalPhpAmount": "0.00",
+              "lifePortfolioList": [
+                {
+                  "referenceNumber": "0815613865",
+                  "productCode": "ML1P1C",
+                  "productName": "Sun Maxilink One",
+                  "statusCode": "PERU",
+                  "statusDesc": "PENDING, ERRORS, REQ'T O/S, U/W REQ'D",
+                  "insuranceCode": "C",
+                  "insuranceType": "Universal Life - Risk",
+                  "policyType": "E",
+                  "issueDate": "01/01/2017",
+                  "currency": "Php",
+                  "faceAmount": 0,
+                  "riderCount": 0,
+                  "lapseStartDate": "-",
+                  "lastDepositAmount": "-",
+                  "lastDepositDate": "-",
+                  "premiumAmount": 0,
+                  "premiumDueDate": "-",
+                  "dividendValue": 0,
+                  "dividendAsofDate": "-",
+                  "billModeCode": "12",
+                  "billMode": "Single Premium",
+                  "billTypeCode": "P",
+                  "billType": "Single Premium",
+                  "insuredId": "3080095310",
+                  "insuredFirstName": "",
+                  "insuredMiddleName": "",
+                  "insuredLastName": "",
+                  "insuredSuffix": "",
+                  "insuredName": "Ownfn Stp2018qkg Ownmn Stp2018qkg Ownln Stp2018qkg",
+                  "relationship": "Insured",
+                  "servicingAdvisor": "052011",
+                  "personalizedName": "Test One",
+                  "freezeOrder": "-"
+                }
+              ],
+              "pageNumber": 1,
+              "numberOfPages": 1,
+              "recordsPerPage": 10
+            },
+            "customMsg": "OK"
+          }
+        },
+        "headers": [
+          {
+            "description": "",
+            "id": "pair_a403c054227041dab03700da8da8f224",
+            "name": "Access-Control-Allow-Origin",
+            "value": "http://127.0.0.1:4200"
+          },
+          {
+            "description": "",
+            "id": "pair_a0e4c36b856b4c64a8f56f9e97802da6",
+            "name": "Access-Control-Allow-Headers",
+            "value": "content-type, X-Traceability-Id"
+          },
+          {
+            "description": "",
+            "id": "pair_1338a8a6a6304bb0a09d1d763ffd711b",
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "statusCode": 200,
+        "statusText": "",
+        "name": "/life",
+        "mimeType": "application/json",
+        "method": "GET",
+        "_type": "mock_route"
+      },
+      {
+        "_id": "mock-route_priority_notifications",
+        "type": "MockRoute",
+        "parentId": "wrk_client_service",
+        "modified": 1718342682983,
+        "created": 1717666987935,
+        "body": {
+          "statusCode": 200,
+          "message": {
+            "result": {
+              "hasBadAddress": false,
+              "policyReminders": [
+                {
+                  "referenceNumber": "031219180",
+                  "hasMissingDob": false,
+                  "paymentReminder": "Due Soon"
+                },
+                {
+                  "referenceNumber": "031279023",
+                  "hasMissingDob": false,
+                  "paymentReminder": "Due Soon"
+                },
+                {
+                  "referenceNumber": "0501392661",
+                  "hasMissingDob": false,
+                  "paymentReminder": "Due Soon"
+                },
+                {
+                  "referenceNumber": "0805126295",
+                  "hasMissingDob": false,
+                  "paymentReminder": "Due Soon"
+                }
+              ]
+            },
+            "customMsg": "OK"
+          }
+        },
+        "headers": [
+          {
+            "description": "",
+            "id": "pair_a403c054227041dab03700da8da8f224",
+            "name": "Access-Control-Allow-Origin",
+            "value": "http://127.0.0.1:4200"
+          },
+          {
+            "description": "",
+            "id": "pair_a0e4c36b856b4c64a8f56f9e97802da6",
+            "name": "Access-Control-Allow-Headers",
+            "value": "content-type, X-Traceability-Id"
+          },
+          {
+            "description": "",
+            "id": "pair_1338a8a6a6304bb0a09d1d763ffd711b",
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "statusCode": 200,
+        "statusText": "",
+        "name": "/priority-notifications",
+        "mimeType": "application/json",
+        "method": "GET",
+        "_type": "mock_route"
+      },  {
+        "_id": "wrk_client_service",
+        "type": "Workspace",
+        "parentId": null,
+        "modified": 1718342615927,
+        "created": 1718342615927,
+        "name": "Client Service API",
+        "description": "The purpose of this API is to manage Client Address. API to retrieve, update and save address in interfacing application.",
+        "scope": "collection",
+        "_type": "workspace"
+      },
+      {
         "_id": "mock-route_health_check",
         "type": "MockRoute",
         "parentId": "wrk_client_service",
